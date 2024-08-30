@@ -1,3 +1,7 @@
+using Budget.Application.Installers;
+using Budget.Infrastructure.Installers;
+using Budget.Web.Installers;
+
 namespace Budget.Web;
 
 public class Program
@@ -5,29 +9,14 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddApplication();
+        builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddWeb();
 
-        // Add services to the container.
-        builder.Services.AddControllersWithViews();
+        var config = builder.Configuration;
 
         var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
-
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
-
+        app.AddMiddleware();
         app.Run();
     }
 }
