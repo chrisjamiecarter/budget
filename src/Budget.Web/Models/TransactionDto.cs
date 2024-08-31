@@ -1,48 +1,46 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Budget.Domain.Entities;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Budget.Infrastructure.Models;
+namespace Budget.Web.Models;
 
-[Table("Transaction")]
-internal class TransactionModel
+public class TransactionDto
 {
     #region Constructors
 
-    public TransactionModel()
+    public TransactionDto()
     {
 
     }
 
-    public TransactionModel(TransactionEntity entity)
+    public TransactionDto(TransactionEntity entity)
     {
         Id = entity.Id;
         Name = entity.Name ?? "";
         Date = entity.Date;
         Amount = entity.Amount;
         CategoryId = entity.Category is null ? new Guid() : entity.Category.Id;
-        Category = entity.Category is null ? null : new CategoryModel(entity.Category);
+        Category = entity.Category is null ? null : new CategoryDto(entity.Category);
     }
 
     #endregion
     #region Properties
 
-    [Key]
     public Guid Id { get; set; }
 
     [Required]
     public string Name { get; set; } = "";
 
-    [DataType(DataType.Date), Required]
+    [DataType(DataType.Date), Display(Name = "Watched"), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime Date { get; set; }
 
-    [Column(TypeName = "decimal(18,2)"), DataType(DataType.Currency), Required]
+    [DataType(DataType.Currency), Required]
     public decimal Amount { get; set; }
 
-    [ForeignKey(nameof(Category))]
     public Guid CategoryId { get; set; }
 
-    public CategoryModel? Category { get; set; }
+    public CategoryDto? Category { get; set; }
 
     #endregion
     #region Methods

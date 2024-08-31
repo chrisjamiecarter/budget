@@ -83,7 +83,7 @@ internal class CategoryRepository : ICategoryRepository
         {
             model.Name = entity.Name ?? "";
             _dataContext.Category.Update(model);
-        }        
+        }
     }
 
     #endregion

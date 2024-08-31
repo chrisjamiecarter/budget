@@ -1,5 +1,6 @@
 ﻿using Budget.Application.Repositories;
 using Budget.Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 namespace Budget.Infrastructure.Repositories;
 
 internal class UnitOfWork : IUnitOfWork
@@ -30,7 +31,14 @@ internal class UnitOfWork : IUnitOfWork
 
     public async Task<int> SaveAsync()
     {
-        return await _dataContext.SaveChangesAsync();
+        try
+        {
+            return await _dataContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw;
+        }
     }
 
     #endregion

@@ -44,8 +44,20 @@ public class CategoryService : ICategoryService
 
     public async Task UpdateAsync(CategoryEntity category)
     {
-        await _unitOfWork.Categories.UpdateAsync(category);
-        await _unitOfWork.SaveAsync();
+        try
+        {
+            await _unitOfWork.Categories.UpdateAsync(category);
+            await _unitOfWork.SaveAsync();
+        }
+        catch (Exception)
+        {
+            var model = await _unitOfWork.Categories.ReturnAsync(category.Id);
+
+            if (model is not null)
+            {
+                throw;
+            }
+        }
     }
 
     #endregion
