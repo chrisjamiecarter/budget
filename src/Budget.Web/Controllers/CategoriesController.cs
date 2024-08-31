@@ -55,7 +55,7 @@ public class CategoriesController : Controller
     {
         if (ModelState.IsValid)
         {
-            // categoryDto.Id = Guid.NewGuid();
+            dto.Id = Guid.NewGuid();
             await _service.CreateAsync(dto.MapToDomain());
             return RedirectToAction(nameof(Index));
         }
@@ -125,12 +125,7 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var entity = await _service.ReturnAsync(id);
-        if (entity is not null)
-        {
-            await _service.DeleteAsync(entity);
-        }
-
+        await _service.DeleteAsync(id);
         return RedirectToAction(nameof(Index));
     }
 }

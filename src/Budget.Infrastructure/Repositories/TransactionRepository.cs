@@ -27,18 +27,11 @@ internal class TransactionRepository : ITransactionRepository
 
     public async Task CreateAsync(TransactionEntity entity)
     {
-        var model = new TransactionModel
-        {
-            Id = Guid.NewGuid(),
-            Name = entity.Name ?? "",
-            Date = entity.Date,
-            Amount = entity.Amount,
-            CategoryId = entity.Category!.Id,
-        };
+        var model = new TransactionModel(entity);
         await _dataContext.Transaction.AddAsync(model);
     }
 
-    public async Task DeleteAsync(object id)
+    public async Task DeleteAsync(Guid id)
     {
         var model = await _dataContext.Transaction.FindAsync(id);
         if (model is not null)

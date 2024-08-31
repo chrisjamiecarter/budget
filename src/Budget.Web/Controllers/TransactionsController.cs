@@ -65,6 +65,7 @@ public class TransactionsController : Controller
             {
                 return NotFound();
             }
+            transaction.Id = Guid.NewGuid();
             transaction.Category = new CategoryDto(category);
             await _transactionService.CreateAsync(transaction.MapToDomain());
             return RedirectToAction(nameof(Index));
@@ -146,11 +147,7 @@ public class TransactionsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var entity = await _transactionService.ReturnAsync(id);
-        if (entity is not null)
-        {
-            await _transactionService.DeleteAsync(entity);
-        }
+        await _transactionService.DeleteAsync(id);
         return RedirectToAction(nameof(Index));
     }
 

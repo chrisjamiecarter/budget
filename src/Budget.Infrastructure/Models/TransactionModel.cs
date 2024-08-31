@@ -20,8 +20,7 @@ internal class TransactionModel
         Name = entity.Name ?? "";
         Date = entity.Date;
         Amount = entity.Amount;
-        CategoryId = entity.Category is null ? new Guid() : entity.Category.Id;
-        Category = entity.Category is null ? null : new CategoryModel(entity.Category);
+        CategoryId = entity.Category!.Id;
     }
 
     #endregion

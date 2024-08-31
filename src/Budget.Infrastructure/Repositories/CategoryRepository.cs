@@ -32,7 +32,7 @@ internal class CategoryRepository : ICategoryRepository
         await _dataContext.Category.AddAsync(model);
     }
 
-    public async Task DeleteAsync(object id)
+    public async Task DeleteAsync(Guid id)
     {
         var model = await _dataContext.Category.FindAsync(id);
         if (model is not null)

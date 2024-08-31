@@ -26,9 +26,9 @@ public class TransactionService : ITransactionService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task DeleteAsync(TransactionEntity transaction)
+    public async Task DeleteAsync(Guid id)
     {
-        await _unitOfWork.Transactions.DeleteAsync(transaction);
+        await _unitOfWork.Transactions.DeleteAsync(id);
         await _unitOfWork.SaveAsync();
     }
 

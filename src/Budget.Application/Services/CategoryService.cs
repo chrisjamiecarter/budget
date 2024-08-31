@@ -26,9 +26,9 @@ public class CategoryService : ICategoryService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task DeleteAsync(CategoryEntity category)
+    public async Task DeleteAsync(Guid id)
     {
-        await _unitOfWork.Categories.DeleteAsync(category);
+        await _unitOfWork.Categories.DeleteAsync(id);
         await _unitOfWork.SaveAsync();
     }
 
