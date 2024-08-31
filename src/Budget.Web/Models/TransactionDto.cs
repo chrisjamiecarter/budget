@@ -32,7 +32,7 @@ public class TransactionDto
     [Required]
     public string Name { get; set; } = "";
 
-    [DataType(DataType.Date), Display(Name = "Watched"), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+    [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime Date { get; set; }
 
     [DataType(DataType.Currency), Required]

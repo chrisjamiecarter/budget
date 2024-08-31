@@ -27,7 +27,14 @@ internal class TransactionRepository : ITransactionRepository
 
     public async Task CreateAsync(TransactionEntity entity)
     {
-        var model = new TransactionModel(entity);
+        var model = new TransactionModel
+        {
+            Id = Guid.NewGuid(),
+            Name = entity.Name ?? "",
+            Date = entity.Date,
+            Amount = entity.Amount,
+            CategoryId = entity.Category!.Id,
+        };
         await _dataContext.Transaction.AddAsync(model);
     }
 

@@ -34,7 +34,7 @@ public class TransactionService : ITransactionService
 
     public async Task<IEnumerable<TransactionEntity>> ReturnAsync()
     {
-        return await _unitOfWork.Transactions.ReturnAsync();
+        return await _unitOfWork.Transactions.ReturnAsync(includeProperties: "Category");
     }
 
     public async Task<TransactionEntity?> ReturnAsync(Guid id)
