@@ -13,8 +13,6 @@ public class Program
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddWeb();
 
-        var config = builder.Configuration;
-
         var app = builder.Build();
         app.AddMiddleware();
         app.Run();
