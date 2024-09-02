@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CategoryDto>
+﻿@model CategoryViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -6,20 +6,23 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div>
+    @* <a asp-action="Create">Create New</a> *@
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-category-modal">
+        Add Category
+    </button>
+</div>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Categories.FirstOrDefault()!.Name)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Categories) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -33,3 +36,11 @@
 }
     </tbody>
 </table>
+
+<partial name="_CreatePartial" />
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

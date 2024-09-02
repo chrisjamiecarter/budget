@@ -1,4 +1,5 @@
 ﻿using Budget.Application.Services;
+using Budget.Domain.Entities;
 using Budget.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +19,14 @@ public class CategoriesController : Controller
     {
         var entities = await _service.ReturnAsync();
 
-        var dtos = entities.Select(x => new CategoryDto(x));
-        return View(dtos);
+        var categories = entities.Select(x => new CategoryDto(x));
+
+        var viewModel = new CategoryViewModel
+        {
+            Categories = categories.ToList(),
+        };
+
+        return View(viewModel);
     }
 
     // GET: Categories/Details/5
@@ -51,16 +58,21 @@ public class CategoriesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name")] CategoryDto dto)
+    public async Task<IActionResult> Create([Bind("Category")] CategoryViewModel viewModel)
     {
         if (ModelState.IsValid)
         {
-            dto.Id = Guid.NewGuid();
-            await _service.CreateAsync(dto.MapToDomain());
+            var category = new CategoryEntity
+            {
+                Id = Guid.NewGuid(),
+                Name = viewModel.Category!.Name
+            };
+
+            await _service.CreateAsync(category);
             return RedirectToAction(nameof(Index));
         }
 
-        return View(dto);
+        return RedirectToAction(nameof(Index));
     }
 
     // GET: Categories/Edit/5
