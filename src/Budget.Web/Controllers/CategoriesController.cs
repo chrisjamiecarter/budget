@@ -85,61 +85,25 @@ public class CategoriesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: Categories/Edit/5
-    public async Task<IActionResult> Edit(Guid? id)
-    {
-        if (!id.HasValue)
-        {
-            return NotFound();
-        }
-
-        var entity = await _categoryService.ReturnAsync(id.Value);
-        if (entity is null)
-        {
-            return NotFound();
-        }
-
-        var dto = new CategoryViewModel(entity);
-        return View(dto);
-    }
-
     // POST: Categories/Edit/5
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name")] CategoryViewModel dto)
+    public async Task<IActionResult> Edit(Guid id, [Bind("Category")] BudgetViewModel viewModel)
     {
-        if (id != dto.Id)
+        if (viewModel.Category is null || id != viewModel.Category!.Id)
         {
             return NotFound();
         }
 
         if (ModelState.IsValid)
         {
-            await _categoryService.UpdateAsync(dto.MapToDomain());
+            await _categoryService.UpdateAsync(viewModel.Category.MapToDomain());
             return RedirectToAction(nameof(Index));
         }
-
-        return View(dto);
-    }
-
-    // GET: Categories/Delete/5
-    public async Task<IActionResult> Delete(Guid? id)
-    {
-        if (!id.HasValue)
-        {
-            return NotFound();
-        }
-
-        var entity = await _categoryService.ReturnAsync(id.Value);
-        if (entity is null)
-        {
-            return NotFound();
-        }
-
-        var dto = new CategoryViewModel(entity);
-        return View(dto);
+        
+        return RedirectToAction(nameof(Index));
     }
 
     // POST: Categories/Delete/5
@@ -152,13 +116,16 @@ public class CategoriesController : Controller
     }
 
     [AcceptVerbs("GET", "POST")]
-    public async Task<IActionResult> IsDuplicateCategoryName([Bind(Prefix = "Category.Name")] string name)
+    public async Task<IActionResult> IsDuplicateCategoryName([Bind(Prefix = "Category.Id")] Guid id, [Bind(Prefix = "Category.Name")] string name)
     {
         var categories = await _categoryService.ReturnAsync();
 
-        return categories.Any(c => c.Name!.Equals(name, StringComparison.CurrentCultureIgnoreCase)) 
-            ? Json("A Categeory with that Name already exists.") 
-            : Json(true);
+        var match = categories.FirstOrDefault(c => c.Name!.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+
+        return match is null || match.Id == id 
+            ? Json(true) 
+            : Json("A Categeory with that Name already exists.");
     }
+
     #endregion
 }

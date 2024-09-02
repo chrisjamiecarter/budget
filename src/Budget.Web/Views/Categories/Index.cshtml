@@ -22,25 +22,30 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Categories) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                @* <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
-                <button type="button" class="btn btn-danger" onclick="deleteCategory('@item.Id')">
-                    Delete
-                </button>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Categories)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @* <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | *@
+                    <button type="button" class="btn btn-warning" onclick="editCategory('@item.Id')">
+                        Edit
+                    </button>
+                    @* <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
+                    <button type="button" class="btn btn-danger" onclick="deleteCategory('@item.Id')">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
 <partial name="_CreatePartial" />
 <partial name="_DeletePartial" />
+<partial name="_EditPartial" />
 
 @section Scripts {
     @{
