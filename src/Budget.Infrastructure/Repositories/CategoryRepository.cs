@@ -63,11 +63,13 @@ internal class CategoryRepository : ICategoryRepository
             query = query.Include(includeProperty);
         }
 
-        var mappedQuery = query.Select(x => x.MapToDomain());
+        var list = await query.ToListAsync();
+
+        var mappedList = list.Select(x => x.MapToDomain()).AsQueryable();
 
         return orderBy is null
-            ? await mappedQuery.ToListAsync()
-            : await orderBy(mappedQuery).ToListAsync();
+            ? mappedList
+            : orderBy(mappedList).ToList();
     }
 
     public async Task<CategoryEntity?> ReturnAsync(object id)

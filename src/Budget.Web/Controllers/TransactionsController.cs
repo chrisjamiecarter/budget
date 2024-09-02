@@ -20,7 +20,7 @@ public class TransactionsController : Controller
     public async Task<IActionResult> Index()
     {
         var entities = await _transactionService.ReturnAsync();
-        var transactions = entities.Select(x => new TransactionDto(x));
+        var transactions = entities.Select(x => new TransactionViewModel(x));
         return View(transactions);
     }
 
@@ -38,7 +38,7 @@ public class TransactionsController : Controller
             return NotFound();
         }
 
-        var transaction = new TransactionDto(entity);
+        var transaction = new TransactionViewModel(entity);
         return View(transaction);
     }
 
@@ -56,7 +56,7 @@ public class TransactionsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name,Date,Amount,CategoryId")] TransactionDto transaction)
+    public async Task<IActionResult> Create([Bind("Id,Name,Date,Amount,CategoryId")] TransactionViewModel transaction)
     {
         if (ModelState.IsValid)
         {
@@ -66,7 +66,7 @@ public class TransactionsController : Controller
                 return NotFound();
             }
             transaction.Id = Guid.NewGuid();
-            transaction.Category = new CategoryDto(category);
+            transaction.Category = new CategoryViewModel(category);
             await _transactionService.CreateAsync(transaction.MapToDomain());
             return RedirectToAction(nameof(Index));
         }
@@ -100,7 +100,7 @@ public class TransactionsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,Date,Amount,CategoryId")] TransactionDto transaction)
+    public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,Date,Amount,CategoryId")] TransactionViewModel transaction)
     {
         if (id != transaction.Id)
         {
@@ -114,7 +114,7 @@ public class TransactionsController : Controller
             {
                 return NotFound();
             }
-            transaction.Category = new CategoryDto(category);
+            transaction.Category = new CategoryViewModel(category);
             await _transactionService.UpdateAsync(transaction.MapToDomain());
             return RedirectToAction(nameof(Index));
         }
@@ -138,7 +138,7 @@ public class TransactionsController : Controller
             return NotFound();
         }
 
-        var transaction = new TransactionDto(entity);
+        var transaction = new TransactionViewModel(entity);
         return View(transaction);
     }
 
@@ -151,9 +151,9 @@ public class TransactionsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
+    private async Task<IEnumerable<CategoryViewModel>> GetCategoriesAsync()
     {
         var entities = await _categoryService.ReturnAsync();
-        return entities.Select(x => new CategoryDto(x));
+        return entities.Select(x => new CategoryViewModel(x));
     }
 }

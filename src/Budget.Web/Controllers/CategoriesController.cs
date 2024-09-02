@@ -7,23 +7,38 @@ namespace Budget.Web.Controllers;
 
 public class CategoriesController : Controller
 {
-    private readonly ICategoryService _service;
+    #region Fields
 
-    public CategoriesController(ICategoryService service)
+    private readonly ICategoryService _categoryService;
+    private readonly ITransactionService _transactionService;
+
+    #endregion
+    #region Constructors
+
+    public CategoriesController(ICategoryService categoryService, ITransactionService transactionService)
     {
-        _service = service;
+        _categoryService = categoryService;
+        _transactionService = transactionService;
     }
+
+    #endregion
+    #region Methods
 
     // GET: Categories
     public async Task<IActionResult> Index()
     {
-        var entities = await _service.ReturnAsync();
+        var categoryEntities = await _categoryService.ReturnAsync(orderBy: o => o.OrderBy(k => k.Name));
+        var transactionEntites = await _transactionService.ReturnAsync(orderBy: o => o.OrderBy(k => k.Date), includeProperties: "Category");
 
-        var categories = entities.Select(x => new CategoryDto(x));
+        var categories = categoryEntities.Select(x => new CategoryViewModel(x));
+        var transactions = transactionEntites.Select(x => new TransactionViewModel(x));
 
-        var viewModel = new CategoryViewModel
+        var viewModel = new BudgetViewModel
         {
             Categories = categories.ToList(),
+            Transactions = transactions.ToList(),
+            Category = new CategoryViewModel(),
+            Transaction = new TransactionViewModel(categories)
         };
 
         return View(viewModel);
@@ -37,13 +52,13 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var entity = await _service.ReturnAsync(id.Value);
+        var entity = await _categoryService.ReturnAsync(id.Value);
         if (entity is null)
         {
             return NotFound();
         }
 
-        var dto = new CategoryDto(entity);
+        var dto = new CategoryViewModel(entity);
         return View(dto);
     }
 
@@ -58,7 +73,7 @@ public class CategoriesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Category")] CategoryViewModel viewModel)
+    public async Task<IActionResult> Create([Bind("Category")] BudgetViewModel viewModel)
     {
         if (ModelState.IsValid)
         {
@@ -68,7 +83,7 @@ public class CategoriesController : Controller
                 Name = viewModel.Category!.Name
             };
 
-            await _service.CreateAsync(category);
+            await _categoryService.CreateAsync(category);
             return RedirectToAction(nameof(Index));
         }
 
@@ -83,13 +98,13 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var entity = await _service.ReturnAsync(id.Value);
+        var entity = await _categoryService.ReturnAsync(id.Value);
         if (entity is null)
         {
             return NotFound();
         }
 
-        var dto = new CategoryDto(entity);
+        var dto = new CategoryViewModel(entity);
         return View(dto);
     }
 
@@ -98,7 +113,7 @@ public class CategoriesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name")] CategoryDto dto)
+    public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name")] CategoryViewModel dto)
     {
         if (id != dto.Id)
         {
@@ -107,7 +122,7 @@ public class CategoriesController : Controller
 
         if (ModelState.IsValid)
         {
-            await _service.UpdateAsync(dto.MapToDomain());
+            await _categoryService.UpdateAsync(dto.MapToDomain());
             return RedirectToAction(nameof(Index));
         }
 
@@ -122,13 +137,13 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var entity = await _service.ReturnAsync(id.Value);
+        var entity = await _categoryService.ReturnAsync(id.Value);
         if (entity is null)
         {
             return NotFound();
         }
 
-        var dto = new CategoryDto(entity);
+        var dto = new CategoryViewModel(entity);
         return View(dto);
     }
 
@@ -137,7 +152,9 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        await _service.DeleteAsync(id);
+        await _categoryService.DeleteAsync(id);
         return RedirectToAction(nameof(Index));
     }
+
+    #endregion
 }

@@ -1,4 +1,5 @@
-﻿using Budget.Application.Repositories;
+﻿using System.Linq.Expressions;
+using Budget.Application.Repositories;
 using Budget.Domain.Entities;
 
 namespace Budget.Application.Services;
@@ -32,9 +33,12 @@ public class CategoryService : ICategoryService
         await _unitOfWork.SaveAsync();
     }
 
-    public async Task<IEnumerable<CategoryEntity>> ReturnAsync()
+    public async Task<IEnumerable<CategoryEntity>> ReturnAsync(
+        Expression<Func<CategoryEntity, bool>>? filter = null, 
+        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null, 
+        string includeProperties = "")
     {
-        return await _unitOfWork.Categories.ReturnAsync();
+        return await _unitOfWork.Categories.ReturnAsync(filter, orderBy, includeProperties);
     }
 
     public async Task<CategoryEntity?> ReturnAsync(Guid id)
