@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Budget.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Budget.Web.Models;
 
@@ -24,7 +25,7 @@ public class CategoryViewModel
 
     public Guid Id { get; set; }
 
-    [Required]
+    [Remote("IsDuplicateCategoryName", "Categories"), Required]
     public string Name { get; set; } = "";
 
     public List<TransactionViewModel>? Transactions { get; set; }

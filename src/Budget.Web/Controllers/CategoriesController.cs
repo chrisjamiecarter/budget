@@ -2,6 +2,7 @@
 using Budget.Domain.Entities;
 using Budget.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Web.Controllers;
 
@@ -150,5 +151,14 @@ public class CategoriesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [AcceptVerbs("GET", "POST")]
+    public async Task<IActionResult> IsDuplicateCategoryName([Bind(Prefix = "Category.Name")] string name)
+    {
+        var categories = await _categoryService.ReturnAsync();
+
+        return categories.Any(c => c.Name!.Equals(name, StringComparison.CurrentCultureIgnoreCase)) 
+            ? Json("A Categeory with that Name already exists.") 
+            : Json(true);
+    }
     #endregion
 }
