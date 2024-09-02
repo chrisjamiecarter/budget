@@ -29,8 +29,10 @@
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @* <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
+                <button type="button" class="btn btn-danger" onclick="deleteCategory('@item.Id')">
+                    Delete
+                </button>
             </td>
         </tr>
 }
@@ -38,6 +40,7 @@
 </table>
 
 <partial name="_CreatePartial" />
+<partial name="_DeletePartial" />
 
 @section Scripts {
     @{

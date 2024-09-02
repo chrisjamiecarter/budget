@@ -4,9 +4,9 @@ public class BudgetViewModel
 {
     #region Properties
 
-    public List<CategoryViewModel>? Categories { get; set; }
+    public List<CategoryViewModel> Categories { get; set; } = [];
 
-    public List<TransactionViewModel>? Transactions { get; set; }
+    public List<TransactionViewModel> Transactions { get; set; } = [];
 
     public CategoryViewModel? Category { get; set; }
 

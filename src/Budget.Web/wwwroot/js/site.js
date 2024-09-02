@@ -1,4 +1,31 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿function deleteCategory(id) {
+    fetch(`Categories/Details/${id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Invalid response from server when getting Category');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+                      
+            const categoryId = document.querySelector('#delete-category-modal #Category_Id');
+            if (categoryId) {
+                categoryId.value = data.id.trim();
+            } else {
+                console.error('Required element #Category_Id not found');
+            }
+            
+            const categoryName = document.querySelector('#delete-category-modal #Category_Name');
+            if (categoryName) {
+                categoryName.value = data.name.trim();
+            } else {
+                console.error('Required element #Category_Name not found');
+            }
 
-// Write your JavaScript code.
+            new bootstrap.Modal(document.getElementById('delete-category-modal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}

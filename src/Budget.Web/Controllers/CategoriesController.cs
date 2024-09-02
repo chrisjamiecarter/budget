@@ -58,14 +58,8 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var dto = new CategoryViewModel(entity);
-        return View(dto);
-    }
-
-    // GET: Categories/Create
-    public IActionResult Create()
-    {
-        return View();
+        var category = new CategoryViewModel(entity);
+        return Ok(category);
     }
 
     // POST: Categories/Create
