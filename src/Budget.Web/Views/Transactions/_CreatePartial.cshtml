@@ -46,3 +46,10 @@
     <input type="submit" value="Create" class="btn btn-primary" />
     
 </form>
+
+@section Scripts {
+    @{
+        // await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        await Html.PartialAsync("_ValidationScriptsPartial");
+    }
+}

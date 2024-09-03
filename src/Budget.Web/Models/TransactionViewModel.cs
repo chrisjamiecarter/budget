@@ -53,7 +53,7 @@ public class TransactionViewModel
     [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime Date { get; set; } = DateTime.Now.Date;
 
-    [DataType(DataType.Currency), Range(0, (double) decimal.MaxValue), Required]
+    [DataType(DataType.Currency), Range(0.01, (double) decimal.MaxValue), Required]
     public decimal Amount { get; set; }
 
     [Display(Name = "Category")]
@@ -61,7 +61,7 @@ public class TransactionViewModel
 
     public CategoryViewModel? Category { get; set; }
 
-    public IEnumerable<SelectListItem> Categories { get; set; } = [];
+    public IEnumerable<SelectListItem> Categories { get; private set; } = [];
 
     #endregion
     #region Methods
@@ -76,6 +76,11 @@ public class TransactionViewModel
             Amount = this.Amount,
             Category = this.Category?.MapToDomain(),
         };
+    }
+
+    public void SetCategories(IEnumerable<CategoryViewModel> categories)
+    {
+        Categories = categories.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList();
     }
 
     #endregion

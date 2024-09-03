@@ -39,7 +39,7 @@ public class TransactionsController : Controller
         }
 
         var transaction = new TransactionViewModel(entity);
-        return View(transaction);
+        return Ok(transaction);
     }
 
     // GET: TransactionModels/Create
@@ -70,12 +70,14 @@ public class TransactionsController : Controller
             transaction.Id = Guid.NewGuid();
             transaction.Category = new CategoryViewModel(category);
             await _transactionService.CreateAsync(transaction.MapToDomain());
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true });
+            //return RedirectToAction(nameof(Index));
         }
 
-        var categories = await GetCategoriesAsync();
-        var viewModel = new TransactionViewModel(categories);
-        return PartialView("_CreatePartial", viewModel);
+        // Reset the SelectList for #Reasons...
+        transaction.SetCategories(await GetCategoriesAsync());
+        
+        return PartialView("_CreatePartial", transaction);
 
         //ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", transaction.CategoryId);
         //return View(transaction);
@@ -125,8 +127,12 @@ public class TransactionsController : Controller
             }
             transaction.Category = new CategoryViewModel(category);
             await _transactionService.UpdateAsync(transaction.MapToDomain());
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true });
+            //return RedirectToAction(nameof(Index));
         }
+
+        // Reset the SelectList for #Reasons...
+        transaction.SetCategories(await GetCategoriesAsync());
 
         return PartialView("_EditPartial", transaction);
 
@@ -161,7 +167,8 @@ public class TransactionsController : Controller
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
         await _transactionService.DeleteAsync(id);
-        return RedirectToAction(nameof(Index));
+        return Json(new { success = true });
+        //return RedirectToAction(nameof(Index));
     }
 
     private async Task<IEnumerable<CategoryViewModel>> GetCategoriesAsync()
