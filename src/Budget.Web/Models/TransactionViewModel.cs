@@ -29,7 +29,7 @@ public class TransactionViewModel
         Category = entity.Category is null ? null : new CategoryViewModel(entity.Category);
     }
 
-    public TransactionViewModel(TransactionEntity entity, List<CategoryViewModel> categories)
+    public TransactionViewModel(TransactionEntity entity, IEnumerable<CategoryViewModel> categories)
     {
         Id = entity.Id;
         Name = entity.Name ?? "";
@@ -51,11 +51,12 @@ public class TransactionViewModel
     public string Name { get; set; } = "";
 
     [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-    public DateTime Date { get; set; }
+    public DateTime Date { get; set; } = DateTime.Now.Date;
 
     [DataType(DataType.Currency), Range(0, (double) decimal.MaxValue), Required]
     public decimal Amount { get; set; }
 
+    [Display(Name = "Category")]
     public Guid CategoryId { get; set; }
 
     public CategoryViewModel? Category { get; set; }

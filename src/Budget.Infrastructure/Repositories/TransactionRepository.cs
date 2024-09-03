@@ -74,6 +74,12 @@ internal class TransactionRepository : ITransactionRepository
     public async Task<TransactionEntity?> ReturnAsync(object id)
     {
         var model = await _dataContext.Transaction.FindAsync(id);
+
+        if (model is not null && model.Category is null)
+        {
+            model.Category = await _dataContext.Category.FindAsync(model.CategoryId);
+        }
+
         return model?.MapToDomain() ?? null;
     }
 

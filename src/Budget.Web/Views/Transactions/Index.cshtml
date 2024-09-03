@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<TransactionViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Transactions";
 }
 
-<h1>Index</h1>
+<h1>Transactions</h1>
+<hr />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transactionModal" data-url="@Url.Action("Create", "Transactions")">Add Transaction</button>
+
 <table class="table">
     <thead>
         <tr>
@@ -24,29 +24,53 @@
             <th>
                 @Html.DisplayNameFor(model => model.Category)
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Amount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category!.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category!.Name)
+                </td>
+                <td>
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#transactionModal" data-url="@Url.Action("Edit", "Transactions", new { id = item.Id })">Edit</button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#transactionModal" data-url="@Url.Action("Delete", "Transactions", new { id = item.Id })">Delete</button>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+
+<!-- Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionModalLabel">Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Content loaded dynamically via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

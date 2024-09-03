@@ -19,7 +19,7 @@ public class TransactionsController : Controller
     // GET: TransactionModels
     public async Task<IActionResult> Index()
     {
-        var entities = await _transactionService.ReturnAsync();
+        var entities = await _transactionService.ReturnAsync(includeProperties: "Category");
         var transactions = entities.Select(x => new TransactionViewModel(x));
         return View(transactions);
     }
@@ -47,8 +47,10 @@ public class TransactionsController : Controller
     {
         var categories = await GetCategoriesAsync();
 
-        ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
-        return View();
+        var viewModel = new TransactionViewModel(categories);
+
+        //ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
+        return PartialView("_CreatePartial", viewModel);
     }
 
     // POST: TransactionModels/Create
@@ -72,8 +74,11 @@ public class TransactionsController : Controller
         }
 
         var categories = await GetCategoriesAsync();
-        ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", transaction.CategoryId);
-        return View(transaction);
+        var viewModel = new TransactionViewModel(categories);
+        return PartialView("_CreatePartial", viewModel);
+
+        //ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", transaction.CategoryId);
+        //return View(transaction);
     }
 
     // GET: TransactionModels/Edit/5
@@ -91,8 +96,12 @@ public class TransactionsController : Controller
         }
 
         var categories = await GetCategoriesAsync();
-        ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", entity.Category!.Id);
-        return View(entity);
+        var viewModel = new TransactionViewModel(entity, categories);
+        return PartialView("_EditPartial", viewModel);
+
+        //var categories = await GetCategoriesAsync();
+        //ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", entity.Category!.Id);
+        //return View(entity);
     }
 
     // POST: TransactionModels/Edit/5
@@ -119,9 +128,11 @@ public class TransactionsController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var categories = await GetCategoriesAsync();
-        ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", transaction.CategoryId);
-        return View(transaction);
+        return PartialView("_EditPartial", transaction);
+
+        //var categories = await GetCategoriesAsync();
+        //ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", transaction.CategoryId);
+        //return View(transaction);
     }
 
     // GET: TransactionModels/Delete/5
@@ -139,7 +150,9 @@ public class TransactionsController : Controller
         }
 
         var transaction = new TransactionViewModel(entity);
-        return View(transaction);
+        return PartialView("_DeletePartial", transaction);
+
+        //return View(transaction);
     }
 
     // POST: TransactionModels/Delete/5
