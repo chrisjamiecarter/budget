@@ -25,7 +25,6 @@ public class CategoryViewModel
 
     public Guid Id { get; set; }
 
-    [Remote("IsDuplicateCategoryName", "Categories", AdditionalFields = "Id"), Required]
     public string Name { get; set; } = "";
 
     public List<TransactionViewModel>? Transactions { get; set; }

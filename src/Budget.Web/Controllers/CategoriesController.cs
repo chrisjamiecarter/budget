@@ -63,6 +63,11 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,Name")] CategoryViewModel category)
     {
+        if (await IsDuplicateCategoryName(category.Id, category.Name))
+        {
+            ModelState.AddModelError("Name", "A Categeory with that Name already exists.");
+        }
+        
         if (ModelState.IsValid)
         {
             category.Id = Guid.NewGuid();
@@ -103,6 +108,11 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
+        if (await IsDuplicateCategoryName(category.Id, category.Name))
+        {
+            ModelState.AddModelError("Name", "A Categeory with that Name already exists.");
+        }
+
         if (ModelState.IsValid)
         {
             await _categoryService.UpdateAsync(category.MapToDomain());
@@ -139,16 +149,13 @@ public class CategoriesController : Controller
         return Json(new { success = true });
     }
 
-    [AcceptVerbs("GET", "POST")]
-    public async Task<IActionResult> IsDuplicateCategoryName([Bind(Prefix = "Category.Id")] Guid id, [Bind(Prefix = "Category.Name")] string name)
+    private async Task<bool> IsDuplicateCategoryName(Guid id, string name)
     {
         var categories = await _categoryService.ReturnAsync();
 
         var match = categories.FirstOrDefault(c => c.Name!.Equals(name, StringComparison.CurrentCultureIgnoreCase));
 
-        return match is null || match.Id == id 
-            ? Json(true) 
-            : Json("A Categeory with that Name already exists.");
+        return match is not null && match.Id != id;
     }
 
     #endregion
