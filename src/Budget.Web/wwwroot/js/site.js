@@ -5,6 +5,8 @@
 
     $.get(url, function (data) {
         modal.find('.modal-body').html(data);
+        // Re-initialize jQuery Unobtrusive Validation
+        $.validator.unobtrusive.parse(modal.find('form'));
     });
 });
 

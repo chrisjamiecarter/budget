@@ -63,7 +63,7 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,Name")] CategoryViewModel category)
     {
-        if (await IsDuplicateCategoryName(category.Id, category.Name))
+        if (ModelState.IsValid && await IsDuplicateCategoryName(category.Id, category.Name))
         {
             ModelState.AddModelError("Name", "A Categeory with that Name already exists.");
         }
@@ -108,7 +108,7 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        if (await IsDuplicateCategoryName(category.Id, category.Name))
+        if (ModelState.IsValid && await IsDuplicateCategoryName(category.Id, category.Name))
         {
             ModelState.AddModelError("Name", "A Categeory with that Name already exists.");
         }
