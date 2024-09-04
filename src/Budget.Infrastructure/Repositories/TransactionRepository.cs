@@ -89,6 +89,10 @@ internal class TransactionRepository : ITransactionRepository
         if (model is not null)
         {
             model.Name = entity.Name ?? "";
+            model.Date = entity.Date;
+            model.Amount = entity.Amount;
+            model.CategoryId = entity.Category!.Id;
+            
             _dataContext.Transaction.Update(model);
         }        
     }
