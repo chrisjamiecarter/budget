@@ -7,24 +7,27 @@
 <h1>Transactions</h1>
 <hr />
 
-<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transactionModal" data-url="@Url.Action("Create", "Transactions")">Add Transaction</button>
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-url="@Url.Action("Create", "Transactions")">
+    Add Transaction
+</button>
 
-<table class="table">
+<table class="table table-hover">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
+            <th class="col-2">
                 @Html.DisplayNameFor(model => model.Date)
+                @await Html.PartialAsync("SVGs/_CaretUp")
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Amount)
-            </th>
-            <th>
+            <th class="col-2">
                 @Html.DisplayNameFor(model => model.Category)
             </th>
-            <th>Actions</th>
+            <th class="col-auto">
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th class="col-2">
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th class="col-lg-2"></th>
         </tr>
     </thead>
     <tbody>
@@ -32,20 +35,24 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.Date)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Amount)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Category!.Name)
                 </td>
                 <td>
-                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#transactionModal" data-url="@Url.Action("Edit", "Transactions", new { id = item.Id })">Edit</button>
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#transactionModal" data-url="@Url.Action("Delete", "Transactions", new { id = item.Id })">Delete</button>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td class="d-flex justify-content-end">
+                    <button class="btn btn-warning me-1" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-url="@Url.Action("Edit", "Transactions", new { id = item.Id })">
+                        @await Html.PartialAsync("SVGs/_Pencil")
+                    </button>
+                    <button class="btn btn-danger me-1" data-bs-toggle="modal" data-bs-target="#dynamicModal" data-url="@Url.Action("Delete", "Transactions", new { id = item.Id })">
+                        @await Html.PartialAsync("SVGs/_Trash")
+                    </button>
                 </td>
             </tr>
         }
@@ -54,11 +61,11 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="transactionModalLabel" aria-hidden="true">
+<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="dynamicModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="transactionModalLabel">Transaction</h5>
+                <h5 class="modal-title" id="dynamicModalLabel">Transaction</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                 </button>
             </div>
@@ -68,9 +75,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

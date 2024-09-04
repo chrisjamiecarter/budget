@@ -1,8 +1,6 @@
 ﻿using Budget.Application.Services;
-using Budget.Domain.Entities;
 using Budget.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Web.Controllers;
 
@@ -11,15 +9,13 @@ public class CategoriesController : Controller
     #region Fields
 
     private readonly ICategoryService _categoryService;
-    private readonly ITransactionService _transactionService;
 
     #endregion
     #region Constructors
 
-    public CategoriesController(ICategoryService categoryService, ITransactionService transactionService)
+    public CategoriesController(ICategoryService categoryService)
     {
         _categoryService = categoryService;
-        _transactionService = transactionService;
     }
 
     #endregion
@@ -28,21 +24,10 @@ public class CategoriesController : Controller
     // GET: Categories
     public async Task<IActionResult> Index()
     {
-        var categoryEntities = await _categoryService.ReturnAsync(orderBy: o => o.OrderBy(k => k.Name));
-        var transactionEntites = await _transactionService.ReturnAsync(orderBy: o => o.OrderBy(k => k.Date), includeProperties: "Category");
-
-        var categories = categoryEntities.Select(x => new CategoryViewModel(x));
-        var transactions = transactionEntites.Select(x => new TransactionViewModel(x));
-
-        var viewModel = new BudgetViewModel
-        {
-            Categories = categories.ToList(),
-            Transactions = transactions.ToList(),
-            Category = new CategoryViewModel(),
-            Transaction = new TransactionViewModel(categories)
-        };
-
-        return View(viewModel);
+        var entities = await _categoryService.ReturnAsync(orderBy: o => o.OrderBy(k => k.Name));
+        var categories = entities.Select(x => new CategoryViewModel(x));
+        
+        return View(categories);
     }
 
     // GET: Categories/Details/5
@@ -63,26 +48,47 @@ public class CategoriesController : Controller
         return Ok(category);
     }
 
+    // GET: Categories/Create
+    public IActionResult Create()
+    {
+        var viewModel = new CategoryViewModel();
+
+        return PartialView("_CreatePartial", viewModel);
+    }
+
     // POST: Categories/Create
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Category")] BudgetViewModel viewModel)
+    public async Task<IActionResult> Create([Bind("Id,Name")] CategoryViewModel category)
     {
         if (ModelState.IsValid)
         {
-            var category = new CategoryEntity
-            {
-                Id = Guid.NewGuid(),
-                Name = viewModel.Category!.Name
-            };
-
-            await _categoryService.CreateAsync(category);
-            return RedirectToAction(nameof(Index));
+            category.Id = Guid.NewGuid();
+            await _categoryService.CreateAsync(category.MapToDomain());
+            return Json(new { success = true });
         }
 
-        return RedirectToAction(nameof(Index));
+        return PartialView("_CreatePartial", category);
+    }
+
+    // GET: Categories/Edit/5
+    public async Task<IActionResult> Edit(Guid? id)
+    {
+        if (!id.HasValue)
+        {
+            return NotFound();
+        }
+
+        var entity = await _categoryService.ReturnAsync(id.Value);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        var viewModel = new CategoryViewModel(entity);
+        return PartialView("_EditPartial", viewModel);
     }
 
     // POST: Categories/Edit/5
@@ -90,20 +96,38 @@ public class CategoriesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("Category")] BudgetViewModel viewModel)
+    public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name")] CategoryViewModel category)
     {
-        if (viewModel.Category is null || id != viewModel.Category!.Id)
+        if (id != category.Id)
         {
             return NotFound();
         }
 
         if (ModelState.IsValid)
         {
-            await _categoryService.UpdateAsync(viewModel.Category.MapToDomain());
-            return RedirectToAction(nameof(Index));
+            await _categoryService.UpdateAsync(category.MapToDomain());
+            return Json(new { success = true });
         }
-        
-        return RedirectToAction(nameof(Index));
+
+        return PartialView("_EditPartial", category);
+    }
+
+    // GET: Categories/Delete/5
+    public async Task<IActionResult> Delete(Guid? id)
+    {
+        if (!id.HasValue)
+        {
+            return NotFound();
+        }
+
+        var entity = await _categoryService.ReturnAsync(id.Value);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        var category = new CategoryViewModel(entity);
+        return PartialView("_DeletePartial", category);
     }
 
     // POST: Categories/Delete/5
@@ -112,7 +136,7 @@ public class CategoriesController : Controller
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
         await _categoryService.DeleteAsync(id);
-        return RedirectToAction(nameof(Index));
+        return Json(new { success = true });
     }
 
     [AcceptVerbs("GET", "POST")]
