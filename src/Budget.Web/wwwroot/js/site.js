@@ -25,10 +25,10 @@ $('#dynamicModal').on('submit', 'form', function (e) {
             if ($(response).find('.validation-summary-errors').length > 0 ||
                 $(response).find('.field-validation-error').length > 0) {
                 // If there are validation errors, replace the modal content with the returned form.
-                $('#transactionModal .modal-body').html($(response)); 
+                $('#dynamicModal .modal-body').html($(response)); 
             } else {
                 // If the form submission was successful (no validation errors)
-                $('#transactionModal').modal('hide');
+                $('#dynamicModal').modal('hide');
                 // Refresh the page to update the transaction list
                 location.reload();
             }
