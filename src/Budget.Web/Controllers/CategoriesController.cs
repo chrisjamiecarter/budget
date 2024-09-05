@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Budget.Web.Controllers;
 
+/// <summary>
+/// Manages the Category-related actions for the Presentation layer.
+/// This controller handles the CRUD operations.
+/// </summary>
 public class CategoriesController : Controller
 {
     #region Fields
@@ -26,7 +30,7 @@ public class CategoriesController : Controller
     {
         var entities = await _categoryService.ReturnAsync(orderBy: o => o.OrderBy(k => k.Name));
         var categories = entities.Select(x => new CategoryViewModel(x));
-        
+
         return View(categories);
     }
 
@@ -67,7 +71,7 @@ public class CategoriesController : Controller
         {
             ModelState.AddModelError("Name", "A Categeory with that Name already exists.");
         }
-        
+
         if (ModelState.IsValid)
         {
             category.Id = Guid.NewGuid();

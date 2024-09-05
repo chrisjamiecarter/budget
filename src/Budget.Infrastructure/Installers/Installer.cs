@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Budget.Infrastructure.Installers;
 
 /// <summary>
-/// Installs all dependencies for the application project.
+/// Registers dependencies and seeds data for the Infrastructure layer.
 /// </summary>
 public static class Installer
 {
@@ -26,5 +26,18 @@ public static class Installer
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
+    }
+
+    public static IServiceProvider SeedDatabase(this IServiceProvider serviceProvider)
+    {
+        var context = serviceProvider.GetRequiredService<BudgetDataContext>();
+        context.Database.Migrate();
+
+        // TODO:
+        var categoryRepository = serviceProvider.GetRequiredService<ICategoryRepository>();
+        var transactionRepository = serviceProvider.GetRequiredService<ITransactionRepository>();
+        //SeederService.SeedDatabase(repository);
+
+        return serviceProvider;
     }
 }

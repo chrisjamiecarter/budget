@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Budget.Application.Installers;
 
 /// <summary>
-/// Installs all dependencies for the application project.
+/// Registers dependencies for the Application layer.
 /// </summary>
 public static class Installer
 {

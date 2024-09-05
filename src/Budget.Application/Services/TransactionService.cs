@@ -4,6 +4,11 @@ using Budget.Domain.Entities;
 
 namespace Budget.Application.Services;
 
+/// <summary>
+/// Service class responsible for managing operations related to the Transaction entity.
+/// Provides methods for creating, updating, deleting, and retrieving category data 
+/// by interacting with the underlying data repositories through the Unit of Work pattern.
+/// </summary>
 public class TransactionService : ITransactionService
 {
     #region Fields

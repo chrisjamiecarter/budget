@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Budget.Domain.Entities;
-using Microsoft.AspNetCore.Mvc;
+﻿using Budget.Domain.Entities;
 
 namespace Budget.Web.Models;
 
+/// <summary>
+/// Represents the view model used to display a Category object in the Presentation layer.
+/// </summary>
 public class CategoryViewModel
 {
     #region Constructors

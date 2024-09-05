@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Budget.Application.Repositories;
 using Budget.Domain.Entities;
 using Budget.Infrastructure.Contexts;
@@ -8,6 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Infrastructure.Repositories;
 
+/// <summary>
+/// Provides repository operations for managing the Infrastructure layer's Category entity.
+/// This class implements the <see cref="ICategoryRepository"/> interface, offering 
+/// methods to perform CRUD operations against the database using Entity Framework Core.
+/// </summary>
 internal class CategoryRepository : ICategoryRepository
 {
     #region Fields
@@ -42,8 +46,8 @@ internal class CategoryRepository : ICategoryRepository
     }
 
     public async Task<IEnumerable<CategoryEntity>> ReturnAsync(
-        Expression<Func<CategoryEntity, bool>>? filter = null, 
-        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null, 
+        Expression<Func<CategoryEntity, bool>>? filter = null,
+        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null,
         string includeProperties = "")
     {
         IQueryable<CategoryModel> query = _dataContext.Category;

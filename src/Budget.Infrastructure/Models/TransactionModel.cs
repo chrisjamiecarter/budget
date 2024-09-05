@@ -4,6 +4,9 @@ using Budget.Domain.Entities;
 
 namespace Budget.Infrastructure.Models;
 
+/// <summary>
+/// Represents a Transaction entity in the infrastructure layer.
+/// </summary>
 [Table("Transaction")]
 internal class TransactionModel
 {

@@ -1,5 +1,8 @@
 ﻿namespace Budget.Domain.Entities;
 
+/// <summary>
+/// Represents a Transaction entity within the Domain layer.
+/// </summary>
 public class TransactionEntity
 {
     #region Properties

@@ -7,6 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Infrastructure.Repositories;
 
+/// <summary>
+/// Provides repository operations for managing the Infrastructure layer's Transaction entity.
+/// This class implements the <see cref="ITransactionRepository"/> interface, offering 
+/// methods to perform CRUD operations against the database using Entity Framework Core.
+/// </summary>
 internal class TransactionRepository : ITransactionRepository
 {
     #region Fields
@@ -41,8 +46,8 @@ internal class TransactionRepository : ITransactionRepository
     }
 
     public async Task<IEnumerable<TransactionEntity>> ReturnAsync(
-        Expression<Func<TransactionEntity, bool>>? filter = null, 
-        Func<IQueryable<TransactionEntity>, IOrderedQueryable<TransactionEntity>>? orderBy = null, 
+        Expression<Func<TransactionEntity, bool>>? filter = null,
+        Func<IQueryable<TransactionEntity>, IOrderedQueryable<TransactionEntity>>? orderBy = null,
         string includeProperties = "")
     {
         IQueryable<TransactionModel> query = _dataContext.Transaction;
@@ -92,9 +97,9 @@ internal class TransactionRepository : ITransactionRepository
             model.Date = entity.Date;
             model.Amount = entity.Amount;
             model.CategoryId = entity.Category!.Id;
-            
+
             _dataContext.Transaction.Update(model);
-        }        
+        }
     }
 
     #endregion

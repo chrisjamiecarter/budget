@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Infrastructure.Contexts;
 
+/// <summary>
+/// Represents the Entity Framework Core database context for the Budget data store.
+/// </summary>
 internal class BudgetDataContext : DbContext
 {
     #region Constructors

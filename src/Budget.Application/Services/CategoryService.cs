@@ -4,6 +4,11 @@ using Budget.Domain.Entities;
 
 namespace Budget.Application.Services;
 
+/// <summary>
+/// Service class responsible for managing operations related to the Category entity.
+/// Provides methods for creating, updating, deleting, and retrieving category data 
+/// by interacting with the underlying data repositories through the Unit of Work pattern.
+/// </summary>
 public class CategoryService : ICategoryService
 {
     #region Fields
@@ -34,8 +39,8 @@ public class CategoryService : ICategoryService
     }
 
     public async Task<IEnumerable<CategoryEntity>> ReturnAsync(
-        Expression<Func<CategoryEntity, bool>>? filter = null, 
-        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null, 
+        Expression<Func<CategoryEntity, bool>>? filter = null,
+        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null,
         string includeProperties = "")
     {
         return await _unitOfWork.Categories.ReturnAsync(filter, orderBy, includeProperties);

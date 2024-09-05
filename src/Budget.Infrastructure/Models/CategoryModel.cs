@@ -4,6 +4,9 @@ using Budget.Domain.Entities;
 
 namespace Budget.Infrastructure.Models;
 
+/// <summary>
+/// Represents a Category entity in the infrastructure layer.
+/// </summary>
 [Table("Category")]
 internal class CategoryModel
 {
@@ -11,7 +14,7 @@ internal class CategoryModel
 
     public CategoryModel()
     {
-        
+
     }
 
     public CategoryModel(CategoryEntity entity)

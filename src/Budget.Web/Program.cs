@@ -4,6 +4,10 @@ using Budget.Web.Installers;
 
 namespace Budget.Web;
 
+/// <summary>
+/// The entry point for the Presentation layer.
+/// This class is responsible for configuring and launching the application.
+/// </summary>
 public class Program
 {
     public static void Main(string[] args)

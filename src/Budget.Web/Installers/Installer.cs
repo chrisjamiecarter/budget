@@ -1,7 +1,7 @@
 ﻿namespace Budget.Web.Installers;
 
 /// <summary>
-/// Installs all dependencies for the application project.
+/// Registers dependencies and middleware for the Presentation layer.
 /// </summary>
 public static class Installer
 {

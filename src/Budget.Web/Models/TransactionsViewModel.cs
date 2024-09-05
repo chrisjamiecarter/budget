@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Budget.Web.Models;
 
+/// <summary>
+/// Represents the view model used to display a list of Transaction view models in the Presentation layer.
+/// </summary>
 public class TransactionsViewModel
 {
     public IEnumerable<TransactionViewModel> Transactions { get; set; } = [];

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Budget.Domain.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Budget.Web.Models;
 
+/// <summary>
+/// Represents the view model used to display a Transaction object in the Presentation layer.
+/// </summary>
 public class TransactionViewModel
 {
     #region Constructors
@@ -37,7 +39,7 @@ public class TransactionViewModel
         Amount = entity.Amount;
         CategoryId = entity.Category is null ? new Guid() : entity.Category.Id;
         Category = entity.Category is null ? null : new CategoryViewModel(entity.Category);
-        
+
         Categories = categories.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name }).ToList();
 
     }
@@ -53,7 +55,7 @@ public class TransactionViewModel
     [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime Date { get; set; } = DateTime.Now.Date;
 
-    [DataType(DataType.Currency), Range(0.01, (double) decimal.MaxValue), Required]
+    [DataType(DataType.Currency), Range(0.01, (double)decimal.MaxValue), Required]
     public decimal Amount { get; set; }
 
     [Display(Name = "Category")]
@@ -62,7 +64,7 @@ public class TransactionViewModel
     public CategoryViewModel? Category { get; set; }
 
     public IEnumerable<SelectListItem> Categories { get; private set; } = [];
-        
+
     #endregion
     #region Methods
 

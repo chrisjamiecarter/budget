@@ -1,5 +1,8 @@
 ﻿namespace Budget.Domain.Entities;
 
+/// <summary>
+/// Represents a Category entity within the Domain layer.
+/// </summary>
 public class CategoryEntity
 {
     #region Properties

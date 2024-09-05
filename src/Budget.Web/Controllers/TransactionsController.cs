@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Budget.Web.Controllers;
 
+/// <summary>
+/// Manages the Transaction-related actions for the Presentation layer.
+/// This controller handles the CRUD operations and also provides filtering and sorting functionalities.
+/// </summary>
 public class TransactionsController : Controller
 {
     #region Fields
@@ -29,7 +33,7 @@ public class TransactionsController : Controller
         var entities = await _transactionService.ReturnAsync(includeProperties: "Category");
 
         var viewModel = new TransactionsViewModel();
-                
+
         if (!string.IsNullOrWhiteSpace(searchName))
         {
             viewModel.SearchName = searchName;
@@ -60,7 +64,7 @@ public class TransactionsController : Controller
 
         viewModel.SetCategories(await GetCategoriesAsync());
         viewModel.Transactions = entities.Select(x => new TransactionViewModel(x));
-        
+
         return View(viewModel);
     }
 
@@ -88,7 +92,7 @@ public class TransactionsController : Controller
         var categories = await GetCategoriesAsync();
 
         var viewModel = new TransactionViewModel(categories);
-                
+
         return PartialView("_CreatePartial", viewModel);
     }
 
@@ -114,7 +118,7 @@ public class TransactionsController : Controller
 
         // Reset the SelectList for #Reasons...
         transaction.SetCategories(await GetCategoriesAsync());
-        
+
         return PartialView("_CreatePartial", transaction);
     }
 
