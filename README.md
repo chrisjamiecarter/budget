@@ -74,9 +74,13 @@ Once the application is running, you can:
 
 ![transactions page](./_resources/budget-transactions.png)
 
+![transactions modals](./_resources/budget-transactions-modals.png)
+
 ### Categories Page
 
 ![categories page](./_resources/budget-categories.png)
+
+![categories modals](./_resources/budget-categories-modals.png)
 
 ## How It Works
 

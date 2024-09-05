@@ -5,8 +5,8 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="row mb-3">
-        <div class="col-2">
-            <label asp-for="Name" class="form-label"></label>
+        <div class="col-2 d-flex align-items-center">
+            <label asp-for="Name" class="form-label mb-0"></label>
         </div>
         <div class="col-10">
             <input asp-for="Name" class="form-control" />
@@ -15,8 +15,8 @@
     </div>
 
     <div class="row mb-3">
-        <div class="col-2">
-            <label asp-for="Date" class="form-label"></label>
+        <div class="col-2 d-flex align-items-center">
+            <label asp-for="Date" class="form-label mb-0"></label>
         </div>
         <div class="col-10">
             <input asp-for="Date" class="form-control" />
@@ -25,8 +25,8 @@
     </div>
 
     <div class="row mb-3">
-        <div class="col-2">
-            <label asp-for="Amount" class="form-label"></label>
+        <div class="col-2 d-flex align-items-center">
+            <label asp-for="Amount" class="form-label mb-0"></label>
         </div>
         <div class="col-10">
             <input asp-for="Amount" class="form-control" />
@@ -35,8 +35,8 @@
     </div>
 
     <div class="row mb-3">
-        <div class="col-2">
-            <label asp-for="CategoryId" class="form-label"></label>
+        <div class="col-2 d-flex align-items-center">
+            <label asp-for="CategoryId" class="form-label mb-0"></label>
         </div>
         <div class="col-10">
             <select asp-for="CategoryId" class="form-control" asp-items="@Model.Categories"></select>
