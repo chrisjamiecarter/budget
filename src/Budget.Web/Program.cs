@@ -19,6 +19,7 @@ public class Program
 
         var app = builder.Build();
         app.AddMiddleware();
+        app.SetUpDatabase();
         app.Run();
     }
 }

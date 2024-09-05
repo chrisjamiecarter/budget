@@ -1,7 +1,9 @@
-﻿namespace Budget.Web.Installers;
+﻿using Budget.Infrastructure.Installers;
+
+namespace Budget.Web.Installers;
 
 /// <summary>
-/// Registers dependencies and middleware for the Presentation layer.
+/// Registers dependencies and adds any required middleware for the Presentation layer.
 /// </summary>
 public static class Installer
 {
@@ -30,6 +32,16 @@ public static class Installer
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Transactions}/{action=Index}/{id?}");
+
+        return app;
+    }
+
+    public static WebApplication SetUpDatabase(this WebApplication app)
+    {
+        // Performs any database migrations and seeds the database.
+        using var scope = app.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        services.SeedDatabase();
 
         return app;
     }

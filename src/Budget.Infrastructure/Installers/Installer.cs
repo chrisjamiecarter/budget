@@ -1,6 +1,7 @@
 ﻿using Budget.Application.Repositories;
 using Budget.Infrastructure.Contexts;
 using Budget.Infrastructure.Repositories;
+using Budget.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ public static class Installer
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ISeederService, SeederService>();
 
         return services;
     }
@@ -33,10 +35,8 @@ public static class Installer
         var context = serviceProvider.GetRequiredService<BudgetDataContext>();
         context.Database.Migrate();
 
-        // TODO:
-        var categoryRepository = serviceProvider.GetRequiredService<ICategoryRepository>();
-        var transactionRepository = serviceProvider.GetRequiredService<ITransactionRepository>();
-        //SeederService.SeedDatabase(repository);
+        var seeder = serviceProvider.GetRequiredService<ISeederService>();
+        seeder.SeedDatabase();
 
         return serviceProvider;
     }
