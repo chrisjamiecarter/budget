@@ -11,7 +11,7 @@ It allows users to view and record what transactions they have made. They can fi
 
 ## Features
 
-- **Transaction**: Create, view, update and delete Transactions. Create/Update/Delete are modal forms!
+- **Transactions**: Create, view, update and delete Transactions. Create/Update/Delete are modal forms!
 - **Categories**: Create, view, update and delete Categories. Create/Update/Delete are modal forms! Be careful, deleting a Category deletes all associated Transactions!!
 - **Filtering**: Filter Transactions by their Name and/or Date and/or Category.
 - **Responsive Design**: A user-friendly interface designed to work on various devices.
