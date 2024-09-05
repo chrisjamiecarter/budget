@@ -24,12 +24,44 @@ public class TransactionsController : Controller
     #region Methods
 
     // GET: Transactions
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchName, string searchStart, string searchEnd, string filterCategory)
     {
-        var entities = await _transactionService.ReturnAsync(includeProperties: "Category", orderBy: o => o.OrderBy(k => k.Date));
-        var transactions = entities.Select(x => new TransactionViewModel(x));
+        var entities = await _transactionService.ReturnAsync(includeProperties: "Category");
+
+        var viewModel = new TransactionsViewModel();
+                
+        if (!string.IsNullOrWhiteSpace(searchName))
+        {
+            viewModel.SearchName = searchName;
+            entities = entities.Where(e => e.Name!.Contains(searchName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchStart))
+        {
+            viewModel.SearchStart = searchStart;
+            var startDate = DateTime.Parse(searchStart);
+            entities = entities.Where(e => e.Date >= startDate);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchEnd))
+        {
+            viewModel.SearchEnd = searchEnd;
+            var endDate = DateTime.Parse(searchEnd);
+            entities = entities.Where(e => e.Date <= endDate);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterCategory))
+        {
+            viewModel.FilterCategory = filterCategory;
+            entities = entities.Where(e => e.Category!.Id == Guid.Parse(filterCategory));
+        }
+
+        entities = entities.OrderBy(e => e.Date);
+
+        viewModel.SetCategories(await GetCategoriesAsync());
+        viewModel.Transactions = entities.Select(x => new TransactionViewModel(x));
         
-        return View(transactions);
+        return View(viewModel);
     }
 
     // GET: Transactions/Details/5

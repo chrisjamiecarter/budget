@@ -62,7 +62,7 @@ public class TransactionViewModel
     public CategoryViewModel? Category { get; set; }
 
     public IEnumerable<SelectListItem> Categories { get; private set; } = [];
-
+        
     #endregion
     #region Methods
 
