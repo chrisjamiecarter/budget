@@ -66,7 +66,7 @@ The web application will migrate and created the database if required.
 
 Once the application is running, you can:
 
-- View Transactions or switch to Categories via the Navbar.
+- View Transactions or switch to Categories via the navigation bar.
 - Filter transactions using the filter options.
 - Create/Update/Delete records by clicking on the associated icons/buttons.
 
