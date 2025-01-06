@@ -1,10 +1,12 @@
 ﻿using Budget.Application.Repositories;
 using Budget.Infrastructure.Contexts;
+using Budget.Infrastructure.Entities;
 using Budget.Infrastructure.Repositories;
 using Budget.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 
 namespace Budget.Infrastructure.Installers;
 
@@ -17,10 +19,16 @@ public static class Installer
     {
         var connectionString = configuration.GetConnectionString("Budget") ?? throw new InvalidOperationException("Connection string 'Budget' not found");
 
-        services.AddDbContext<BudgetDataContext>(options =>
+        services.AddDbContext<BudgetDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
         });
+
+        services.AddDefaultIdentity<BudgetUserEntity>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = false;
+        })
+        .AddEntityFrameworkStores<BudgetDbContext>();
 
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -32,7 +40,7 @@ public static class Installer
 
     public static IServiceProvider SeedDatabase(this IServiceProvider serviceProvider)
     {
-        var context = serviceProvider.GetRequiredService<BudgetDataContext>();
+        var context = serviceProvider.GetRequiredService<BudgetDbContext>();
         context.Database.Migrate();
 
         var seeder = serviceProvider.GetRequiredService<ISeederService>();

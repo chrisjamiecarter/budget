@@ -17,12 +17,12 @@ internal class CategoryRepository : ICategoryRepository
     #region Fields
 
     private static readonly char[] _separator = [','];
-    private readonly BudgetDataContext _dataContext;
+    private readonly BudgetDbContext _dataContext;
 
     #endregion
     #region Constructors
 
-    public CategoryRepository(BudgetDataContext dataContext)
+    public CategoryRepository(BudgetDbContext dataContext)
     {
         _dataContext = dataContext;
     }

@@ -17,12 +17,12 @@ internal class TransactionRepository : ITransactionRepository
     #region Fields
 
     private static readonly char[] _separator = [','];
-    private readonly BudgetDataContext _dataContext;
+    private readonly BudgetDbContext _dataContext;
 
     #endregion
     #region Constructors
 
-    public TransactionRepository(BudgetDataContext dataContext)
+    public TransactionRepository(BudgetDbContext dataContext)
     {
         _dataContext = dataContext;
     }

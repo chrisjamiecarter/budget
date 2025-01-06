@@ -33,12 +33,12 @@ internal class SeederService : ISeederService
         "Transport"
     ];
 
-    private readonly BudgetDataContext _context;
+    private readonly BudgetDbContext _context;
 
     #endregion
     #region Constructors
 
-    public SeederService(BudgetDataContext context)
+    public SeederService(BudgetDbContext context)
     {
         _context = context;
     }

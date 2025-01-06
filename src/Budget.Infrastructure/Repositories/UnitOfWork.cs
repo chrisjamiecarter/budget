@@ -16,12 +16,12 @@ internal class UnitOfWork : IUnitOfWork
 {
     #region Fields
 
-    private readonly BudgetDataContext _dataContext;
+    private readonly BudgetDbContext _dataContext;
 
     #endregion
     #region Constructors
 
-    public UnitOfWork(BudgetDataContext dataContext, ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
+    public UnitOfWork(BudgetDbContext dataContext, ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
     {
         _dataContext = dataContext;
         Categories = categoryRepository;
