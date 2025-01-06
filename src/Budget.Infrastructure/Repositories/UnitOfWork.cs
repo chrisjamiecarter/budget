@@ -1,6 +1,7 @@
 ﻿using Budget.Application.Repositories;
 using Budget.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 namespace Budget.Infrastructure.Repositories;
 
 /// <summary>
@@ -16,16 +17,18 @@ internal class UnitOfWork : IUnitOfWork
 {
     #region Fields
 
-    private readonly BudgetDbContext _dataContext;
+    private readonly BudgetDbContext _context;
+    private readonly ILogger _logger;
 
     #endregion
     #region Constructors
 
-    public UnitOfWork(BudgetDbContext dataContext, ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
+    public UnitOfWork(BudgetDbContext context, ICategoryRepository categoryRepository, ITransactionRepository transactionRepository, ILogger<UnitOfWork> logger)
     {
-        _dataContext = dataContext;
+        _context = context;
         Categories = categoryRepository;
         Transactions = transactionRepository;
+        _logger = logger;
     }
 
     #endregion
@@ -42,11 +45,12 @@ internal class UnitOfWork : IUnitOfWork
     {
         try
         {
-            return await _dataContext.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
-        catch (DbUpdateConcurrencyException)
+        catch (Exception exception)
         {
-            throw;
+            _logger.LogWarning(exception.Message);
+            return -1;
         }
     }
 

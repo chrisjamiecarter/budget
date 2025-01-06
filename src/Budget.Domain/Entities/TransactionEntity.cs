@@ -3,17 +3,17 @@
 /// <summary>
 /// Represents a Transaction entity within the Domain layer.
 /// </summary>
-public class TransactionEntity
+public class TransactionEntity : EntityBase
 {
     #region Properties
 
-    public Guid Id { get; set; }
+    public required string Name { get; set; }
 
-    public string? Name { get; set; }
+    public required DateTime Date { get; set; }
 
-    public DateTime Date { get; set; }
+    public required decimal Amount { get; set; }
 
-    public decimal Amount { get; set; }
+    public required Guid CategoryId { get; set; }
 
     public CategoryEntity? Category { get; set; }
 

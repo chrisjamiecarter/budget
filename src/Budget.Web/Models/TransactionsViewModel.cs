@@ -28,5 +28,4 @@ public class TransactionsViewModel
     {
         Categories = categories.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
     }
-
 }

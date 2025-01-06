@@ -1,4 +1,7 @@
 ﻿using Budget.Infrastructure.Installers;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace Budget.Web.Installers;
 
@@ -10,7 +13,7 @@ public static class Installer
     public static IServiceCollection AddWeb(this IServiceCollection services)
     {
         services.AddControllersWithViews();
-
+                
         return services;
     }
 

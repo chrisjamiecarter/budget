@@ -68,7 +68,7 @@ public class TransactionViewModel
     #endregion
     #region Methods
 
-    public TransactionEntity MapToDomain()
+    public TransactionEntity MapToDomain(Guid userId)
     {
         return new TransactionEntity
         {
@@ -76,7 +76,8 @@ public class TransactionViewModel
             Name = this.Name,
             Date = this.Date,
             Amount = this.Amount,
-            Category = this.Category?.MapToDomain(),
+            CategoryId = this.CategoryId,
+            Category = this.Category?.MapToDomain(userId),
         };
     }
 

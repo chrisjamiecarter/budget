@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
+using System.Transactions;
 using Budget.Application.Repositories;
 using Budget.Domain.Entities;
+using Budget.Domain.Services;
 
 namespace Budget.Application.Services;
 
@@ -26,47 +28,37 @@ public class CategoryService : ICategoryService
     #endregion
     #region Methods
 
-    public async Task CreateAsync(CategoryEntity category)
+    public async Task<bool> CreateAsync(CategoryEntity category)
     {
         await _unitOfWork.Categories.CreateAsync(category);
-        await _unitOfWork.SaveAsync();
+        var created = await _unitOfWork.SaveAsync();
+        return created > 0;
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid userId, CategoryEntity category)
     {
-        await _unitOfWork.Categories.DeleteAsync(id);
-        await _unitOfWork.SaveAsync();
+        await _unitOfWork.Categories.DeleteAsync(userId, category);
+        var deleted = await _unitOfWork.SaveAsync();
+        return deleted > 0;
     }
 
-    public async Task<IEnumerable<CategoryEntity>> ReturnAsync(
-        Expression<Func<CategoryEntity, bool>>? filter = null,
-        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null,
-        string includeProperties = "")
+    public async Task<IReadOnlyList<CategoryEntity>> ReturnAsync(Guid userId)
     {
-        return await _unitOfWork.Categories.ReturnAsync(filter, orderBy, includeProperties);
+        var entities = await _unitOfWork.Categories.ReturnAsync(userId);
+
+        return entities.OrderBy(x => x.Name).ToList();
     }
 
-    public async Task<CategoryEntity?> ReturnAsync(Guid id)
+    public async Task<CategoryEntity?> ReturnAsync(Guid userId, Guid id)
     {
-        return await _unitOfWork.Categories.ReturnAsync(id);
+        return await _unitOfWork.Categories.ReturnAsync(userId, id);
     }
 
-    public async Task UpdateAsync(CategoryEntity category)
+    public async Task<bool> UpdateAsync(Guid userId, CategoryEntity category)
     {
-        try
-        {
-            await _unitOfWork.Categories.UpdateAsync(category);
-            await _unitOfWork.SaveAsync();
-        }
-        catch (Exception)
-        {
-            var model = await _unitOfWork.Categories.ReturnAsync(category.Id);
-
-            if (model is not null)
-            {
-                throw;
-            }
-        }
+        await _unitOfWork.Categories.UpdateAsync(userId, category);
+        var updated = await _unitOfWork.SaveAsync();
+        return updated > 0;
     }
 
     #endregion

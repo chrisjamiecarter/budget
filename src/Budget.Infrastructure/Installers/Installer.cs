@@ -3,10 +3,10 @@ using Budget.Infrastructure.Contexts;
 using Budget.Infrastructure.Entities;
 using Budget.Infrastructure.Repositories;
 using Budget.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 
 namespace Budget.Infrastructure.Installers;
 
@@ -28,6 +28,7 @@ public static class Installer
         {
             options.SignIn.RequireConfirmedAccount = false;
         })
+        .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<BudgetDbContext>();
 
         services.AddScoped<ICategoryRepository, CategoryRepository>();

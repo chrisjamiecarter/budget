@@ -1,4 +1,5 @@
 ﻿using Budget.Application.Services;
+using Budget.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Budget.Application.Installers;

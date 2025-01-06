@@ -33,15 +33,15 @@ public class CategoryViewModel
     #endregion
     #region Methods
 
-    public CategoryEntity MapToDomain()
+    public CategoryEntity MapToDomain(Guid userId)
     {
         return new CategoryEntity
         {
             Id = this.Id,
             Name = this.Name,
+            UserId = userId,
         };
     }
 
     #endregion
-
 }

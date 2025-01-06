@@ -8,12 +8,9 @@ namespace Budget.Application.Repositories;
 /// </summary>
 public interface ITransactionRepository
 {
-    Task CreateAsync(TransactionEntity entity);
-    Task DeleteAsync(Guid id);
-    Task<IEnumerable<TransactionEntity>> ReturnAsync(
-        Expression<Func<TransactionEntity, bool>>? filter = null,
-        Func<IQueryable<TransactionEntity>, IOrderedQueryable<TransactionEntity>>? orderBy = null,
-        string includeProperties = "");
-    Task<TransactionEntity?> ReturnAsync(object id);
-    Task UpdateAsync(TransactionEntity entity);
+    Task CreateAsync(TransactionEntity transaction);
+    Task DeleteAsync(Guid userId, TransactionEntity transaction);
+    Task<IReadOnlyList<TransactionEntity>> ReturnAsync(Guid userId);
+    Task<TransactionEntity?> ReturnAsync(Guid userId, Guid id);
+    Task UpdateAsync(Guid userId, TransactionEntity transaction);
 }

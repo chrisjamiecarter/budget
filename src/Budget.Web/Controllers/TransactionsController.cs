@@ -1,5 +1,7 @@
-﻿using Budget.Application.Services;
+﻿using System.Security.Claims;
+using Budget.Domain.Services;
 using Budget.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Budget.Web.Controllers;
@@ -8,20 +10,23 @@ namespace Budget.Web.Controllers;
 /// Manages the Transaction-related actions for the Presentation layer.
 /// This controller handles the CRUD operations and also provides filtering and sorting functionalities.
 /// </summary>
+[Authorize]
 public class TransactionsController : Controller
 {
     #region Fields
 
     private readonly ICategoryService _categoryService;
     private readonly ITransactionService _transactionService;
+    private readonly ILogger _logger;
 
     #endregion
     #region Constructors
 
-    public TransactionsController(ICategoryService categoryService, ITransactionService transactionService)
+    public TransactionsController(ICategoryService categoryService, ITransactionService transactionService, ILogger<TransactionsController> logger)
     {
         _categoryService = categoryService;
         _transactionService = transactionService;
+        _logger = logger;
     }
 
     #endregion
@@ -30,39 +35,37 @@ public class TransactionsController : Controller
     // GET: Transactions
     public async Task<IActionResult> Index(string searchName, string searchStart, string searchEnd, string filterCategory)
     {
-        var entities = await _transactionService.ReturnAsync(includeProperties: "Category");
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return View(new List<TransactionViewModel>());
+        }
+
+        var entities = await _transactionService.ReturnAsync(userId, searchName, searchStart, searchEnd, filterCategory);
 
         var viewModel = new TransactionsViewModel();
 
         if (!string.IsNullOrWhiteSpace(searchName))
         {
             viewModel.SearchName = searchName;
-            entities = entities.Where(e => e.Name!.Contains(searchName, StringComparison.OrdinalIgnoreCase));
         }
 
         if (!string.IsNullOrWhiteSpace(searchStart))
         {
             viewModel.SearchStart = searchStart;
-            var startDate = DateTime.Parse(searchStart);
-            entities = entities.Where(e => e.Date >= startDate);
         }
 
         if (!string.IsNullOrWhiteSpace(searchEnd))
         {
             viewModel.SearchEnd = searchEnd;
-            var endDate = DateTime.Parse(searchEnd);
-            entities = entities.Where(e => e.Date <= endDate);
         }
 
         if (!string.IsNullOrWhiteSpace(filterCategory))
         {
             viewModel.FilterCategory = filterCategory;
-            entities = entities.Where(e => e.Category!.Id == Guid.Parse(filterCategory));
         }
 
-        entities = entities.OrderBy(e => e.Date);
-
-        viewModel.SetCategories(await GetCategoriesAsync());
+        viewModel.SetCategories(await GetCategoriesAsync(userId));
         viewModel.Transactions = entities.Select(x => new TransactionViewModel(x));
 
         return View(viewModel);
@@ -76,7 +79,13 @@ public class TransactionsController : Controller
             return NotFound();
         }
 
-        var entity = await _transactionService.ReturnAsync(id.Value);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return View(new List<CategoryViewModel>());
+        }
+
+        var entity = await _transactionService.ReturnAsync(userId, id.Value);
         if (entity is null)
         {
             return NotFound();
@@ -89,7 +98,13 @@ public class TransactionsController : Controller
     // GET: Transactions/Create
     public async Task<IActionResult> Create()
     {
-        var categories = await GetCategoriesAsync();
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
+        var categories = await GetCategoriesAsync(userId);
 
         var viewModel = new TransactionViewModel(categories);
 
@@ -103,21 +118,27 @@ public class TransactionsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,Name,Date,Amount,CategoryId")] TransactionViewModel transaction)
     {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
         if (ModelState.IsValid)
         {
-            var category = await _categoryService.ReturnAsync(transaction.CategoryId);
+            var category = await _categoryService.ReturnAsync(userId, transaction.CategoryId);
             if (category is null)
             {
                 return NotFound();
             }
-            transaction.Id = Guid.NewGuid();
+            transaction.Id = Guid.CreateVersion7();
             transaction.Category = new CategoryViewModel(category);
-            await _transactionService.CreateAsync(transaction.MapToDomain());
+            await _transactionService.CreateAsync(transaction.MapToDomain(userId));
             return Json(new { success = true });
         }
 
         // Reset the SelectList for #Reasons...
-        transaction.SetCategories(await GetCategoriesAsync());
+        transaction.SetCategories(await GetCategoriesAsync(userId));
 
         return PartialView("_CreatePartial", transaction);
     }
@@ -130,13 +151,19 @@ public class TransactionsController : Controller
             return NotFound();
         }
 
-        var entity = await _transactionService.ReturnAsync(id.Value);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
+        var entity = await _transactionService.ReturnAsync(userId, id.Value);
         if (entity is null)
         {
             return NotFound();
         }
 
-        var categories = await GetCategoriesAsync();
+        var categories = await GetCategoriesAsync(userId);
         var viewModel = new TransactionViewModel(entity, categories);
         return PartialView("_EditPartial", viewModel);
     }
@@ -153,20 +180,26 @@ public class TransactionsController : Controller
             return NotFound();
         }
 
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
         if (ModelState.IsValid)
         {
-            var category = await _categoryService.ReturnAsync(transaction.CategoryId);
+            var category = await _categoryService.ReturnAsync(userId, transaction.CategoryId);
             if (category is null)
             {
                 return NotFound();
             }
             transaction.Category = new CategoryViewModel(category);
-            await _transactionService.UpdateAsync(transaction.MapToDomain());
+            await _transactionService.UpdateAsync(userId, transaction.MapToDomain(userId));
             return Json(new { success = true });
         }
 
         // Reset the SelectList for #Reasons...
-        transaction.SetCategories(await GetCategoriesAsync());
+        transaction.SetCategories(await GetCategoriesAsync(userId));
 
         return PartialView("_EditPartial", transaction);
     }
@@ -179,7 +212,13 @@ public class TransactionsController : Controller
             return NotFound();
         }
 
-        var entity = await _transactionService.ReturnAsync(id.Value);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return View(new List<CategoryViewModel>());
+        }
+
+        var entity = await _transactionService.ReturnAsync(userId, id.Value);
         if (entity is null)
         {
             return NotFound();
@@ -194,13 +233,25 @@ public class TransactionsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        await _transactionService.DeleteAsync(id);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
+        var entity = await _transactionService.ReturnAsync(userId, id);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        await _transactionService.DeleteAsync(userId, entity);
         return Json(new { success = true });
     }
 
-    private async Task<IEnumerable<CategoryViewModel>> GetCategoriesAsync()
+    private async Task<IEnumerable<CategoryViewModel>> GetCategoriesAsync(Guid userId)
     {
-        var entities = await _categoryService.ReturnAsync();
+        var entities = await _categoryService.ReturnAsync(userId);
         return entities.Select(x => new CategoryViewModel(x));
     }
 

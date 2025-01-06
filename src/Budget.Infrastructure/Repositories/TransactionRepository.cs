@@ -1,8 +1,6 @@
-﻿using System.Linq.Expressions;
-using Budget.Application.Repositories;
+﻿using Budget.Application.Repositories;
 using Budget.Domain.Entities;
 using Budget.Infrastructure.Contexts;
-using Budget.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Infrastructure.Repositories;
@@ -16,89 +14,49 @@ internal class TransactionRepository : ITransactionRepository
 {
     #region Fields
 
-    private static readonly char[] _separator = [','];
-    private readonly BudgetDbContext _dataContext;
+    private readonly BudgetDbContext _context;
 
     #endregion
     #region Constructors
 
-    public TransactionRepository(BudgetDbContext dataContext)
+    public TransactionRepository(BudgetDbContext context)
     {
-        _dataContext = dataContext;
+        _context = context;
     }
 
     #endregion
     #region Methods
 
-    public async Task CreateAsync(TransactionEntity entity)
+    public async Task CreateAsync(TransactionEntity transaction)
     {
-        var model = new TransactionModel(entity);
-        await _dataContext.Transaction.AddAsync(model);
+        await _context.Transaction.AddAsync(transaction);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid userId, TransactionEntity transaction)
     {
-        var model = await _dataContext.Transaction.FindAsync(id);
-        if (model is not null)
+        var entity = await _context.Transaction.Include(i => i.Category).SingleOrDefaultAsync(x => x.Category!.UserId == userId && x.Id == transaction.Id);
+        if (entity is not null)
         {
-            _dataContext.Transaction.Remove(model);
+            _context.Transaction.Remove(entity);
         }
     }
 
-    public async Task<IEnumerable<TransactionEntity>> ReturnAsync(
-        Expression<Func<TransactionEntity, bool>>? filter = null,
-        Func<IQueryable<TransactionEntity>, IOrderedQueryable<TransactionEntity>>? orderBy = null,
-        string includeProperties = "")
+    public async Task<IReadOnlyList<TransactionEntity>> ReturnAsync(Guid userId)
     {
-        IQueryable<TransactionModel> query = _dataContext.Transaction;
-
-        // Map the filter expression from the Entity (Domain) to the Model (Infrastructure).
-        if (filter is not null)
-        {
-            var parameter = Expression.Parameter(typeof(TransactionModel), "x");
-            var body = Expression.Invoke(filter, Expression.Convert(parameter, typeof(TransactionEntity)));
-            var lambda = Expression.Lambda<Func<TransactionModel, bool>>(body, parameter);
-
-            query = query.Where(lambda);
-        }
-
-        foreach (var includeProperty in includeProperties.Split(_separator, StringSplitOptions.RemoveEmptyEntries))
-        {
-            query = query.Include(includeProperty);
-        }
-
-        var list = await query.ToListAsync();
-
-        var mappedList = list.Select(x => x.MapToDomain()).AsQueryable();
-
-        return orderBy is null
-            ? mappedList
-            : orderBy(mappedList).ToList();
+        return await _context.Transaction.Include(i => i.Category).Where(x => x.Category!.UserId == userId).ToListAsync();
     }
 
-    public async Task<TransactionEntity?> ReturnAsync(object id)
+    public async Task<TransactionEntity?> ReturnAsync(Guid userId, Guid id)
     {
-        var model = await _dataContext.Transaction.FindAsync(id);
-
-        if (model is not null && model.Category is null)
-        {
-            model.Category = await _dataContext.Category.FindAsync(model.CategoryId);
-        }
-
-        return model?.MapToDomain() ?? null;
+        return await _context.Transaction.Include(i => i.Category).SingleOrDefaultAsync(x => x.Category!.UserId == userId && x.Id == id);
     }
 
-    public async Task UpdateAsync(TransactionEntity entity)
+    public async Task UpdateAsync(Guid userId, TransactionEntity transaction)
     {
-        var model = await _dataContext.Transaction.FindAsync(entity.Id);
-        if (model is not null)
+        var entity = await _context.Transaction.Include(i => i.Category).SingleOrDefaultAsync(x => x.Category!.UserId == userId && x.Id == transaction.Id);
+        if (entity is not null)
         {
-            model.Name = entity.Name ?? "";
-            model.Date = entity.Date;
-            model.Amount = entity.Amount;
-            model.CategoryId = entity.Category!.Id;
-
-            _dataContext.Transaction.Update(model);
+            _context.Transaction.Entry(entity).CurrentValues.SetValues(transaction);
         }
     }
 

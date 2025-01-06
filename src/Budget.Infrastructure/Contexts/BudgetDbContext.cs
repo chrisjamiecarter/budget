@@ -1,5 +1,6 @@
-﻿using Budget.Infrastructure.Entities;
-using Budget.Infrastructure.Models;
+﻿using Budget.Domain.Entities;
+using Budget.Infrastructure.Configurations;
+using Budget.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,9 +18,9 @@ internal class BudgetDbContext : IdentityDbContext<BudgetUserEntity>
     #endregion
     #region Properties
 
-    public DbSet<CategoryModel> Category { get; set; }
+    public DbSet<CategoryEntity> Category { get; set; } = default!;
 
-    public DbSet<TransactionModel> Transaction { get; set; }
+    public DbSet<TransactionEntity> Transaction { get; set; } = default!;
 
     #endregion
     #region Methods
@@ -27,6 +28,9 @@ internal class BudgetDbContext : IdentityDbContext<BudgetUserEntity>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+        modelBuilder.ApplyConfiguration(new TransactionConfiguration());
     }
 
     #endregion

@@ -1,8 +1,6 @@
-﻿using System.Linq.Expressions;
-using Budget.Application.Repositories;
+﻿using Budget.Application.Repositories;
 using Budget.Domain.Entities;
 using Budget.Infrastructure.Contexts;
-using Budget.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Infrastructure.Repositories;
@@ -16,79 +14,49 @@ internal class CategoryRepository : ICategoryRepository
 {
     #region Fields
 
-    private static readonly char[] _separator = [','];
-    private readonly BudgetDbContext _dataContext;
+    private readonly BudgetDbContext _context;
 
     #endregion
     #region Constructors
 
-    public CategoryRepository(BudgetDbContext dataContext)
+    public CategoryRepository(BudgetDbContext context)
     {
-        _dataContext = dataContext;
+        _context = context;
     }
 
     #endregion
     #region Methods
 
-    public async Task CreateAsync(CategoryEntity entity)
+    public async Task CreateAsync(CategoryEntity category)
     {
-        var model = new CategoryModel(entity);
-        await _dataContext.Category.AddAsync(model);
+        await _context.Category.AddAsync(category);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid userId, CategoryEntity category)
     {
-        var model = await _dataContext.Category.FindAsync(id);
-        if (model is not null)
+        var entity = await _context.Category.SingleOrDefaultAsync(x => x.UserId == userId && x.Id == category.Id);
+        if (entity is not null)
         {
-            _dataContext.Category.Remove(model);
+            _context.Category.Remove(entity);
         }
     }
 
-    public async Task<IEnumerable<CategoryEntity>> ReturnAsync(
-        Expression<Func<CategoryEntity, bool>>? filter = null,
-        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null,
-        string includeProperties = "")
+    public async Task<IReadOnlyList<CategoryEntity>> ReturnAsync(Guid userId)
     {
-        IQueryable<CategoryModel> query = _dataContext.Category;
-
-        // Map the filter expression from the Entity (Domain) to the Model (Infrastructure).
-        if (filter is not null)
-        {
-            var parameter = Expression.Parameter(typeof(CategoryModel), "x");
-            var body = Expression.Invoke(filter, Expression.Convert(parameter, typeof(CategoryEntity)));
-            var lambda = Expression.Lambda<Func<CategoryModel, bool>>(body, parameter);
-
-            query = query.Where(lambda);
-        }
-
-        foreach (var includeProperty in includeProperties.Split(_separator, StringSplitOptions.RemoveEmptyEntries))
-        {
-            query = query.Include(includeProperty);
-        }
-
-        var list = await query.ToListAsync();
-
-        var mappedList = list.Select(x => x.MapToDomain()).AsQueryable();
-
-        return orderBy is null
-            ? mappedList
-            : orderBy(mappedList).ToList();
+        return await _context.Category.Where(x => x.UserId == userId).ToListAsync();
     }
 
-    public async Task<CategoryEntity?> ReturnAsync(object id)
+    public async Task<CategoryEntity?> ReturnAsync(Guid userId, Guid id)
     {
-        var model = await _dataContext.Category.FindAsync(id);
-        return model?.MapToDomain() ?? null;
+        return await _context.Category.SingleOrDefaultAsync(x => x.UserId == userId && x.Id == id);
     }
 
-    public async Task UpdateAsync(CategoryEntity entity)
+    public async Task UpdateAsync(Guid userId, CategoryEntity category)
     {
-        var model = await _dataContext.Category.FindAsync(entity.Id);
-        if (model is not null)
+        var entity = await _context.Category.SingleOrDefaultAsync(x => x.UserId == userId && x.Id == category.Id);
+        if (entity is not null)
         {
-            model.Name = entity.Name ?? "";
-            _dataContext.Category.Update(model);
+            _context.Category.Entry(entity).CurrentValues.SetValues(category);
         }
     }
 

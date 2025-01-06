@@ -1,5 +1,7 @@
-﻿using Budget.Application.Services;
+﻿using System.Security.Claims;
+using Budget.Domain.Services;
 using Budget.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Budget.Web.Controllers;
@@ -8,18 +10,21 @@ namespace Budget.Web.Controllers;
 /// Manages the Category-related actions for the Presentation layer.
 /// This controller handles the CRUD operations.
 /// </summary>
+[Authorize]
 public class CategoriesController : Controller
 {
     #region Fields
 
     private readonly ICategoryService _categoryService;
+    private readonly ILogger _logger;
 
     #endregion
     #region Constructors
 
-    public CategoriesController(ICategoryService categoryService)
+    public CategoriesController(ICategoryService categoryService, ILogger<CategoriesController> logger)
     {
         _categoryService = categoryService;
+        _logger = logger;
     }
 
     #endregion
@@ -28,7 +33,13 @@ public class CategoriesController : Controller
     // GET: Categories
     public async Task<IActionResult> Index()
     {
-        var entities = await _categoryService.ReturnAsync(orderBy: o => o.OrderBy(k => k.Name));
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return View(new List<CategoryViewModel>());
+        }
+
+        var entities = await _categoryService.ReturnAsync(userId);
         var categories = entities.Select(x => new CategoryViewModel(x));
 
         return View(categories);
@@ -42,7 +53,13 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var entity = await _categoryService.ReturnAsync(id.Value);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return View(new List<CategoryViewModel>());
+        }
+
+        var entity = await _categoryService.ReturnAsync(userId, id.Value);
         if (entity is null)
         {
             return NotFound();
@@ -67,15 +84,21 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,Name")] CategoryViewModel category)
     {
-        if (ModelState.IsValid && await IsDuplicateCategoryName(category.Id, category.Name))
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
+        if (ModelState.IsValid && await IsDuplicateCategoryName(userId, category.Id, category.Name))
         {
             ModelState.AddModelError("Name", "A Categeory with that Name already exists.");
         }
 
         if (ModelState.IsValid)
         {
-            category.Id = Guid.NewGuid();
-            await _categoryService.CreateAsync(category.MapToDomain());
+            category.Id = Guid.CreateVersion7();
+            await _categoryService.CreateAsync(category.MapToDomain(userId));
             return Json(new { success = true });
         }
 
@@ -90,7 +113,13 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var entity = await _categoryService.ReturnAsync(id.Value);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
+        var entity = await _categoryService.ReturnAsync(userId, id.Value);
         if (entity is null)
         {
             return NotFound();
@@ -112,14 +141,20 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        if (ModelState.IsValid && await IsDuplicateCategoryName(category.Id, category.Name))
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
+        if (ModelState.IsValid && await IsDuplicateCategoryName(userId, category.Id, category.Name))
         {
             ModelState.AddModelError("Name", "A Categeory with that Name already exists.");
         }
 
         if (ModelState.IsValid)
         {
-            await _categoryService.UpdateAsync(category.MapToDomain());
+            await _categoryService.UpdateAsync(userId, category.MapToDomain(userId));
             return Json(new { success = true });
         }
 
@@ -134,7 +169,13 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var entity = await _categoryService.ReturnAsync(id.Value);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return View(new List<CategoryViewModel>());
+        }
+
+        var entity = await _categoryService.ReturnAsync(userId, id.Value);
         if (entity is null)
         {
             return NotFound();
@@ -149,13 +190,25 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        await _categoryService.DeleteAsync(id);
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return NotFound();
+        }
+
+        var entity = await _categoryService.ReturnAsync(userId, id);
+        if (entity is null)
+        {
+            return NotFound();
+        }
+
+        await _categoryService.DeleteAsync(userId, entity);
         return Json(new { success = true });
     }
 
-    private async Task<bool> IsDuplicateCategoryName(Guid id, string name)
+    private async Task<bool> IsDuplicateCategoryName(Guid userId, Guid id, string name)
     {
-        var categories = await _categoryService.ReturnAsync();
+        var categories = await _categoryService.ReturnAsync(userId);
 
         var match = categories.FirstOrDefault(c => c.Name!.Equals(name, StringComparison.CurrentCultureIgnoreCase));
 

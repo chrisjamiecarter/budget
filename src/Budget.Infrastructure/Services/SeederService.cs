@@ -1,6 +1,9 @@
 ﻿using Bogus;
+using Budget.Domain.Entities;
 using Budget.Infrastructure.Contexts;
-using Budget.Infrastructure.Models;
+using Budget.Infrastructure.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Infrastructure.Services;
 
@@ -34,54 +37,50 @@ internal class SeederService : ISeederService
     ];
 
     private readonly BudgetDbContext _context;
+    private readonly UserManager<BudgetUserEntity> _userManager;
 
     #endregion
     #region Constructors
 
-    public SeederService(BudgetDbContext context)
+    public SeederService(BudgetDbContext context, UserManager<BudgetUserEntity> userManager)
     {
         _context = context;
+        _userManager = userManager;
+        Randomizer.Seed = new Random(19890309);
     }
 
     #endregion
     #region Methods
 
     public void SeedDatabase()
-    {
-        // Categories first.
-        SeedCategories();
+     {
+        var users = SeedUsers().Result;
 
-        // Transactions require Categories.
-        SeedTransactions();
+        foreach (var user in users)
+        {
+            Guid userId = Guid.Parse(user.Id);
+
+            SeedCategories(userId);
+
+            SeedTransactions(userId);
+        }
     }
 
-    private void SeedCategories()
+    private void SeedCategories(Guid userId)
     {
-        if (_context.Category.Any())
-        {
-            return;
-        }
-
         foreach (var category in _categories)
         {
-            _context.Category.Add(new CategoryModel { Name = category });
-
+            _context.Category.Add(new CategoryEntity { Id = Guid.CreateVersion7(), Name = category, UserId = userId });
         }
         _context.SaveChanges();
     }
 
-    private void SeedTransactions()
+    private void SeedTransactions(Guid userId)
     {
-        Randomizer.Seed = new Random(19890309);
+        var categories = _context.Category.AsNoTracking().Where(x => x.UserId == userId).ToList();
 
-        if (_context.Transaction.Any())
-        {
-            return;
-        }
-
-        var categories = _context.Category.ToList();
-
-        var fakeTransactions = new Faker<TransactionModel>()
+        var fakeTransactions = new Faker<TransactionEntity>()
+            .RuleFor(t => t.Id, f => Guid.CreateVersion7())
             .RuleFor(t => t.CategoryId, f => f.PickRandom(categories).Id)
             .RuleFor(t => t.Date, f => f.Date.Past(1))
             .RuleFor(t => t.Name, (f, t) => f.Commerce.Product())
@@ -93,6 +92,26 @@ internal class SeederService : ISeederService
         }
 
         _context.SaveChanges();
+    }
+
+    private async Task<IReadOnlyList<BudgetUserEntity>> SeedUsers()
+    {
+        if (_userManager.Users.Any())
+        {
+            return [];
+        }
+
+        await _userManager.CreateAsync(new BudgetUserEntity
+        {
+            UserName = "admin@email.com"
+        }, "adminADMIN123;'#");
+
+        await _userManager.CreateAsync(new BudgetUserEntity
+        {
+            UserName = "user@email.com"
+        }, "userUSER123;'#");
+
+        return await _userManager.Users.ToListAsync();
     }
 
     #endregion

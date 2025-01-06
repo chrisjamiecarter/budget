@@ -8,12 +8,9 @@ namespace Budget.Application.Repositories;
 /// </summary>
 public interface ICategoryRepository
 {
-    Task CreateAsync(CategoryEntity entity);
-    Task DeleteAsync(Guid id);
-    Task<IEnumerable<CategoryEntity>> ReturnAsync(
-        Expression<Func<CategoryEntity, bool>>? filter = null,
-        Func<IQueryable<CategoryEntity>, IOrderedQueryable<CategoryEntity>>? orderBy = null,
-        string includeProperties = "");
-    Task<CategoryEntity?> ReturnAsync(object id);
-    Task UpdateAsync(CategoryEntity entity);
+    Task CreateAsync(CategoryEntity category);
+    Task DeleteAsync(Guid userId, CategoryEntity category);
+    Task<IReadOnlyList<CategoryEntity>> ReturnAsync(Guid userId);
+    Task<CategoryEntity?> ReturnAsync(Guid userId, Guid id);
+    Task UpdateAsync(Guid userId, CategoryEntity category);
 }
