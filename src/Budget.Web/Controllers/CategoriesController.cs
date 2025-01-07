@@ -1,8 +1,10 @@
 ﻿using System.Security.Claims;
+using Budget.Domain.Entities;
 using Budget.Domain.Services;
 using Budget.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Web.Controllers;
 
@@ -14,6 +16,26 @@ namespace Budget.Web.Controllers;
 public class CategoriesController : Controller
 {
     #region Fields
+
+    private readonly string[] _categories =
+    [
+        "Bills",
+        "Charity",
+        "Eating Out",
+        "Entertainment",
+        "Expenses",
+        "Family",
+        "Finances",
+        "General",
+        "Gifts",
+        "Groceries",
+        "Holidays",
+        "Personal Care",
+        "Savings",
+        "Shopping",
+        "Transfers",
+        "Transport"
+    ];
 
     private readonly ICategoryService _categoryService;
     private readonly ILogger _logger;
@@ -103,6 +125,27 @@ public class CategoriesController : Controller
         }
 
         return PartialView("_CreatePartial", category);
+    }
+
+    public async Task<IActionResult> CreateDefault()
+    {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            _logger.LogWarning("Unable to get logged in user id");
+            return RedirectToAction("Index", "Categories");
+        }
+
+        var existingCategories = await _categoryService.ReturnAsync(userId);
+
+        foreach (var category in _categories)
+        {
+            if (!existingCategories.Select(x => x.Name).Contains(category))
+            {
+                await _categoryService.CreateAsync(new CategoryEntity { Id = Guid.CreateVersion7(), Name = category, UserId = userId });
+            }
+        }
+
+        return RedirectToAction("Index", "Categories");
     }
 
     // GET: Categories/Edit/5
