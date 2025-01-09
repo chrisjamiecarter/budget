@@ -43,12 +43,12 @@ internal class CategoryRepository : ICategoryRepository
 
     public async Task<IReadOnlyList<CategoryEntity>> ReturnAsync(Guid userId)
     {
-        return await _context.Category.Where(x => x.UserId == userId).ToListAsync();
+        return await _context.Category.AsNoTracking().Where(x => x.UserId == userId).ToListAsync();
     }
 
     public async Task<CategoryEntity?> ReturnAsync(Guid userId, Guid id)
     {
-        return await _context.Category.SingleOrDefaultAsync(x => x.UserId == userId && x.Id == id);
+        return await _context.Category.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId && x.Id == id);
     }
 
     public async Task UpdateAsync(Guid userId, CategoryEntity category)
