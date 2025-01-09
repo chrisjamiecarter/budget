@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Budget.Domain.Entities;
 using Budget.Domain.Services;
 using Budget.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -131,9 +132,17 @@ public class TransactionsController : Controller
             {
                 return NotFound();
             }
-            transaction.Id = Guid.CreateVersion7();
-            transaction.Category = new CategoryViewModel(category);
-            await _transactionService.CreateAsync(transaction.MapToDomain(userId));
+
+            var newTransaction = new TransactionEntity
+            {
+                Id = Guid.CreateVersion7(),
+                Amount = transaction.Amount,
+                CategoryId = transaction.CategoryId,
+                Date = transaction.Date,
+                Name = transaction.Name,
+            };
+
+            await _transactionService.CreateAsync(newTransaction);
             return Json(new { success = true });
         }
 

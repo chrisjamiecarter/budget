@@ -28,7 +28,6 @@ public class TransactionService : ITransactionService
 
     public async Task<bool> CreateAsync(TransactionEntity transaction)
     {
-        transaction.Category = null;
         await _unitOfWork.Transactions.CreateAsync(transaction);
         var created = await _unitOfWork.SaveAsync();
         return created > 0;
