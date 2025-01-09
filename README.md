@@ -96,6 +96,8 @@ Once the application is running, you can:
 - Filter transactions using the filter options.
 - Create/Update/Delete records by clicking on the associated icons/buttons.
 
+### YouTube Demonstration
+
 Please refer to the short YouTube video demonstration below:
 
 [![YouTube Video Demonstration](./_resources/budget-login.png)](https://www.youtube.com/watch?v=pzejdsZM8V8 "Budget Showcase")
