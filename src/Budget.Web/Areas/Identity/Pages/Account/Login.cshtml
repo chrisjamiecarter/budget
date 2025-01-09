@@ -25,15 +25,14 @@
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="form-check">
-                            <label asp-for="Input.RememberMe" class="form-check-label">
-                                <input class="form-check-input me-2" asp-for="Input.RememberMe" />
-                                @Html.DisplayNameFor(m => m.Input.RememberMe)
-                            </label>
-                        </div>
-                        <a class="text-body" id="forgotPassword" asp-page="./ForgotPassword">Forgot your password?</a>
+                    <div class="form-check mb-3">
+                        <label asp-for="Input.RememberMe" class="form-check-label">
+                            <input class="form-check-input me-2" asp-for="Input.RememberMe" />
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
                     </div>
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
                     <div class="text-center text-lg-start mt-4 pt-2">
                         <button id="loginSubmit" type="submit" class="btn btn-primary btn-lg px-3">
@@ -41,7 +40,7 @@
                         </button>
                         <p class="small fw-bold mt-2 pt-1 mb-0">
                             Don't have an account? 
-                            <a class="link-danger" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register</a>
+                            <a class="link-primary" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register</a>
                         </p>
                     </div>
                 </form>
