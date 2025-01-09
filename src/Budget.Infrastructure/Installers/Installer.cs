@@ -49,6 +49,7 @@ public static class Installer
                 {
                     TableName = "Logs",
                     SchemaName = "audit",
+                    AutoCreateSqlDatabase = true,
                     AutoCreateSqlTable = true,
                 },
                 restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
