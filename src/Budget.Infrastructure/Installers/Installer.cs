@@ -47,7 +47,7 @@ public static class Installer
                 connectionString: connectionString,
                 sinkOptions: new MSSqlServerSinkOptions
                 {
-                    TableName = "Logs",
+                    TableName = "Log",
                     SchemaName = "audit",
                     AutoCreateSqlDatabase = true,
                     AutoCreateSqlTable = true,
