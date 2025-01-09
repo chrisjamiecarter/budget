@@ -139,6 +139,7 @@ namespace Budget.Web.Areas.Identity.Pages.Account
                 }
                 foreach (var error in result.Errors)
                 {
+                    _logger.LogWarning("Unable to register user: {errorCode} - {errorDescription}", error.Code, error.Description);
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }

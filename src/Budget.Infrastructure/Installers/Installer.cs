@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 
 namespace Budget.Infrastructure.Installers;
 
@@ -35,6 +37,28 @@ public static class Installer
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<ISeederService, SeederService>();
+
+        services.AddLogging(config =>
+        {
+            var sqllogger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .Enrich.WithMachineName()
+            .WriteTo.MSSqlServer(
+                connectionString: connectionString,
+                sinkOptions: new MSSqlServerSinkOptions
+                {
+                    TableName = "Logs",
+                    SchemaName = "audit",
+                    AutoCreateSqlTable = true,
+                },
+                restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
+                formatProvider: null,
+                columnOptions: null,
+                logEventFormatter: null)
+            .CreateLogger();
+
+            config.AddSerilog(sqllogger);
+        });
 
         return services;
     }
